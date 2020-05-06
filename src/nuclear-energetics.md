@@ -381,15 +381,25 @@ parents_alpha_decay.head(10)
 ```python
 parents_alpha_decay.plot.scatter(x="A", y="E_kin (MeV)",figsize=(15,8), 
                                  title="Kinetic energy of alpha decay products     (Fig 3)");
+plt.plot((270, 0), (0, 0), 'r-');
 ```
 
-Fig 3 shows us that on the whole (with the exception of He-5, Li-5 and Be-8) spontaneous alpha decay is only possible when the mass number gets higher than about 100. We can see this explicitly by querying the `parents_alpha_decay` table
+Fig 3 shows us that on the whole (with the exception of He-5, Li-5 and Be-8) spontaneous alpha decay is only energetically possible when the mass number gets higher than about 100. We can see this explicitly by querying the `parents_alpha_decay` table
 
 ```python
 parents_alpha_decay.query("`E_kin (MeV)` > 0")
 ```
 
-We can also use the query function to pick out some favourite elements, e.g. Palladium and Silver
+We can also see that if we are able to deposit more energy (in MeV) than
+
+```python
+abs(parents_alpha_decay["E_kin (MeV)"].min())
+```
+
+Then, energetically speaking, alpha decay is possible for all elements.
+
+
+Some elements, require a lot less than 25MeV. For example, we can use the query function to pick out  [Palladium](https://en.wikipedia.org/wiki/Palladium) and [Silver](https://en.wikipedia.org/wiki/Silver)
 
 ```python
 fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15,8), sharey=True)
@@ -398,6 +408,27 @@ parents_alpha_decay.query("EL=='Pd'").plot.scatter(x="A", y="E_kin (MeV)", ax=ax
 parents_alpha_decay.query("EL=='Ag'").plot.scatter(x="A", y="E_kin (MeV)",ax=axes[1],
                                     title="Kinetic energy of Ag alpha decay products     (Fig 5)");
 ```
+
+For the most abundant type of palladium (Pd-108):
+
+```python
+parents_alpha_decay.query("EL=='Pd' & A==108")
+```
+
+We would need to provide at least 3.9MeV of energy to make alpha decay energetically possible.
+
+In contrast, Silver (whose most abundant isotope is Ag-107):
+
+```python
+parents_alpha_decay.query("EL=='Ag' & A==107")
+```
+
+requires only 2.8MeV.
+
+
+## Next up...
+
+Energetics is just one of the factors to consider when hunting for possible novel nuclear reactions. We will explore some of the other factors in the next notebook.
 
 ```python
 
