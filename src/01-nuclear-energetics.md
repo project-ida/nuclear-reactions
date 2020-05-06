@@ -303,7 +303,7 @@ The energy difference between reactants (Li-6 + n) and products (H-3 + alpha) is
  (H3["Mass (u)"].values[0] + alpha["Mass (u)"].values[0]) )*u
 ```
 
-So, 4.78MeV of energy is released when we combine Li-6 and a neutron - there is therefore no need to "bombard" the Li-6 with very high energy neutrons, apparently any energy will do.
+So, 4.78MeV of energy is released via alpha decay when we combine Li-6 with a neutron - there is therefore no need to "bombard" the Li-6 with very high energy neutrons, apparently any energy will do.
 
 We can play these kind of energy comparison games for many different scenarios in order to hunt for possible novel reactions. It is helpful to be able to do these comparisons across many elements at once - this is what we will finish with.
 
