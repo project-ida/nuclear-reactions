@@ -399,7 +399,7 @@ abs(parents_alpha_decay["E_kin (MeV)"].min())
 Then, energetically speaking, alpha decay is possible for all elements.
 
 
-Some elements, require a lot less than 25MeV. For example, we can "chain" together the query function to the plotting function in order conveniently pick out  [Palladium](https://en.wikipedia.org/wiki/Palladium) and [Silver](https://en.wikipedia.org/wiki/Silver)
+Some elements, require a lot less than 25MeV. For example, we can "chain" together the query function to the plotting function in order to conveniently pick out  [Palladium](https://en.wikipedia.org/wiki/Palladium) and [Silver](https://en.wikipedia.org/wiki/Silver)
 
 ```python
 fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15,8), sharey=True)
