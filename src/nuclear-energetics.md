@@ -102,7 +102,7 @@ The IAEA data above contains the following columns of data:
 - **EL** - Element label
 - **DEL_M (keV)** - [Mass excess](https://en.wikipedia.org/wiki/Mass_excess) in keV (technically this should be $keV/c^2$ but the $c^2$ factor is often dropped)
 - **BE/A (keV)** - Binding energy per nucleon in keV
-- **Mass (mu-u)** - Atomic mass in millionths of a standard atomic mass unit ([Dalton](https://en.wikipedia.org/wiki/Dalton_(unit)))
+- **Mass (mu-u)** - Atomic mass in millionths of a standard [atomic mass unit](https://en.wikipedia.org/wiki/Dalton_(unit%29) (aka Dalton)
 
 
 Let's first renormalise our units from `keV` into `MeV` for energy and from `mu-u` to `u` for mass units. (*n.b. we don't do this in the csv file because of the [precision limitations](https://docs.python.org/3/tutorial/floatingpoint.html) of the resulting floating point numbers*)
@@ -131,7 +131,7 @@ most_stable_index = iaea["BE/A (MeV)"].argmax()
 iaea.loc[most_stable_index]
 ```
 
-$^{62}Ni$ again - lovely.
+Ni-62 again - lovely.
 
 We are now going to use the IAEA data to look at the energetics of alpha decay.
 
@@ -193,7 +193,7 @@ alpha_binding_energy = mass_defect*u/4
 alpha_binding_energy
 ```
 
-It is sometimes convenient to think about the mass of a nucleus in terms of how much it deviate from the simple picture given by the number of nucleons. For Heluium this would be:
+It is sometimes convenient to think about the mass of a nucleus in terms of how much it deviates from the simple picture given by the number of nucleons. For Heluium this would be:
 
 ```python
 4.002603254 - 4
@@ -257,7 +257,7 @@ This is indeed what is reported (see "Decay modes" in [U-238 wiki entry](https:/
 
 In addition to decay processes that happen spontaneously, we can also imagine exciting nuclei into higher energy states from which they are then energetically able to decay. [Photodisintegration](https://en.wikipedia.org/wiki/Photodisintegration), [Photofission](https://en.wikipedia.org/wiki/Photofission) and [Neutron activation](https://en.wikipedia.org/wiki/Neutron_activation) are examples of such a situation.
 
-Another important example that we'll now look at is the [breeding of tritium from lithium](https://en.wikipedia.org/wiki/Tritium#Lithium).
+Another important example (in the context of nuclear fusion) that we'll now look at is the [breeding of tritium from lithium](https://en.wikipedia.org/wiki/Tritium#Lithium).
 
 
 Most of the lithium in the world is Li-7
@@ -267,7 +267,7 @@ Li7 = iaea.query("N==4 & Z==3")
 Li7
 ```
 
-If we are to imagine the possibility of Li-7 undergoing alpha decay then, it's daughter nucleus would have the following numbers of neutrons and protons:
+If we are to imagine the possibility of Li-7 undergoing alpha decay, then it's daughter nucleus would have the following number of neutrons and protons:
 
 ```python
 daughter_NZ = Li7[["N","Z"]] - alpha[["N","Z"]].values[0]
@@ -399,12 +399,14 @@ abs(parents_alpha_decay["E_kin (MeV)"].min())
 Then, energetically speaking, alpha decay is possible for all elements.
 
 
-Some elements, require a lot less than 25MeV. For example, we can use the query function to pick out  [Palladium](https://en.wikipedia.org/wiki/Palladium) and [Silver](https://en.wikipedia.org/wiki/Silver)
+Some elements, require a lot less than 25MeV. For example, we can "chain" together the query function to the plotting function in order conveniently pick out  [Palladium](https://en.wikipedia.org/wiki/Palladium) and [Silver](https://en.wikipedia.org/wiki/Silver)
 
 ```python
 fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15,8), sharey=True)
+
 parents_alpha_decay.query("EL=='Pd'").plot.scatter(x="A", y="E_kin (MeV)", ax=axes[0],
                                     title="Kinetic energy of Pd alpha decay products     (Fig 4)");
+
 parents_alpha_decay.query("EL=='Ag'").plot.scatter(x="A", y="E_kin (MeV)",ax=axes[1],
                                     title="Kinetic energy of Ag alpha decay products     (Fig 5)");
 ```
@@ -429,7 +431,3 @@ requires only 2.8MeV.
 ## Next up...
 
 Energetics is just one of the factors to consider when hunting for possible novel nuclear reactions. We will explore some of the other factors in the next notebook.
-
-```python
-
-```
