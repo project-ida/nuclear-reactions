@@ -405,10 +405,10 @@ Some elements, require a lot less than 25MeV. For example, we can "chain" togeth
 fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15,8), sharey=True)
 
 parents_alpha_decay.query("EL=='Pd'").plot.scatter(x="A", y="E_kin (MeV)", ax=axes[0],
-                                    title="Kinetic energy of Pd alpha decay products     (Fig 4)");
+                                    title="Kinetic energy of Pd alpha decay products     (Fig 4)", label="Pd isotopes");
 
 parents_alpha_decay.query("EL=='Ag'").plot.scatter(x="A", y="E_kin (MeV)",ax=axes[1],
-                                    title="Kinetic energy of Ag alpha decay products     (Fig 5)");
+                                    title="Kinetic energy of Ag alpha decay products     (Fig 5)", label="Ag isotopes");
 ```
 
 For the most abundant type of palladium (Pd-108):
