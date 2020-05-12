@@ -34,7 +34,7 @@ import matplotlib.pyplot as plt
 ## Binding energy
 
 
-Binding energy is the amount of energy you need to put into a nucleus in order to separate it into its constituent protons and neutrons.
+Binding energy is the characteristic energy that is tied up in a nucleus to hold it together. When a nucleus forms, the required binding energy is taken from the mass of the constituents. As a result, the bound nucleus is lighter than the sum of constituents by an amount of mass corresponding to the binding energy of that nucleus. These conversions between energy and mass are rooted in the [mass-energy-equivalence](https://en.wikipedia.org/wiki/Mass%E2%80%93energy_equivalence) and we will jump back and forth between mass and energy a lot more further down in this notebook.
 
 There are many places where you can find data about the binding energy for different nuclei - we will look at two of them.
 
