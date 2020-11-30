@@ -1,3 +1,17 @@
+<a href="https://colab.research.google.com/github/project-ida/nuclear/blob/master/02-internuclear-potentials.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="https://nbviewer.jupyter.org/github/project-ida/nuclear/blob/master/02-internuclear-potentials.ipynb" target="_parent"><img src="https://nbviewer.jupyter.org/static/img/nav_logo.svg" alt="Open In nbviewer" width="100"/></a>
+
+
+# Internuclear potentials
+
+
+This notebooks looks at different sections of the internuclear potential between two nuclei, specifically two deuterium nuclei as in the case of a molecule of deuterons D2. 
+
+The three potentials considered are:
+1. The Kolos & Wolniewicz numerical potential and the Morse potential
+2. The Coulomb potential
+3. The Woods-Saxon nuclear potential
+
+
 ## Loading libraries and helper functions
 
 ```python
@@ -8,7 +22,7 @@ import numpy as np
 from scipy.constants import pi, epsilon_0, e
 from matplotlib import pyplot as plt
 
-import dygraphs.graph as dy
+import dygraphs.graph as dy 
 ```
 
 ```python
