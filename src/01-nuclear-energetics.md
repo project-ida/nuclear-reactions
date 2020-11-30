@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.3.3
+      jupytext_version: 1.4.1
   kernelspec:
     display_name: Python 3
     language: python
@@ -382,6 +382,7 @@ parents_alpha_decay.head(10)
 parents_alpha_decay.plot.scatter(x="A", y="E_kin (MeV)",figsize=(15,8), 
                                  title="Kinetic energy of alpha decay products     (Fig 3)");
 plt.plot((270, 0), (0, 0), 'r-');
+#plt.xlim(50,100);
 ```
 
 Fig 3 shows us that on the whole (with the exception of He-5, Li-5 and Be-8) spontaneous alpha decay is only energetically possible when the mass number gets higher than about 100. We can see this explicitly by querying the `parents_alpha_decay` table
