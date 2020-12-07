@@ -1,6 +1,6 @@
-# nuclear
+# nuclear-reactions
 
-This repo is dedicated to exploring nuclear processes.
+This repo is dedicated to exploring nuclear reactions.
 
 ## Tutorials
 
