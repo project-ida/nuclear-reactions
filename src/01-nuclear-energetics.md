@@ -6,14 +6,14 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.4.1
+      jupytext_version: 1.3.3
   kernelspec:
     display_name: Python 3
     language: python
     name: python3
 ---
 
-<a href="https://colab.research.google.com/github/project-ida/nuclear/blob/master/01-nuclear-energetics.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="https://nbviewer.jupyter.org/github/project-ida/nuclear/blob/master/01-nuclear-energetics.ipynb" target="_parent"><img src="https://nbviewer.jupyter.org/static/img/nav_logo.svg" alt="Open In nbviewer" width="100"/></a>
+<a href="https://colab.research.google.com/github/project-ida/nuclear-reactions/blob/master/01-nuclear-energetics.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="https://nbviewer.jupyter.org/github/project-ida/nuclear-reactions/blob/master/01-nuclear-energetics.ipynb" target="_parent"><img src="https://nbviewer.jupyter.org/static/img/nav_logo.svg" alt="Open In nbviewer" width="100"/></a>
 
 
 # Energetics of nuclear reactions
@@ -382,7 +382,6 @@ parents_alpha_decay.head(10)
 parents_alpha_decay.plot.scatter(x="A", y="E_kin (MeV)",figsize=(15,8), 
                                  title="Kinetic energy of alpha decay products     (Fig 3)");
 plt.plot((270, 0), (0, 0), 'r-');
-#plt.xlim(50,100);
 ```
 
 Fig 3 shows us that on the whole (with the exception of He-5, Li-5 and Be-8) spontaneous alpha decay is only energetically possible when the mass number gets higher than about 100. We can see this explicitly by querying the `parents_alpha_decay` table
