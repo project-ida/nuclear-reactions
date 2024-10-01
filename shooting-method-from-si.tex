@@ -1,0 +1,264 @@
+
+\subsubsection*{Modeling unstable states}
+
+
+In this section we consider issues associated with the calculation of unstable two-body states.  As above we are interested
+in solutions to the radial Schr\"odinger equation
+
+\begin{equation}
+E P
+~=~
+\bigg (
+- {\hbar^2 \over 2 \mu} {d^2 \over dr^2}
++ {\hbar^2 \over 2 \mu r^2}
++ V_C
++ V_N
+\bigg )
+P
+\end{equation}
+
+\noindent
+subject to boundary conditions
+
+\begin{equation}
+%\begin{split}
+P(0) ~=~ 0
+$$
+$$
+%\\
+P(r) ~\to~ A e^{i k r}
+%\end{split}
+\end{equation}
+
+
+We need to develop a normalized version of the problem.  Then since we have a boundary condition at large $r$, we want to integrate inwards to match the boundary condition at the origin. Since there are both real and imaginary parts, we require two degrees of
+freedom to arrange for matching both boundary conditions.
+
+It is simplest to work in units of fm and MeV. We can write
+
+\begin{equation}
+{\hbar^2 \over 2 \mu ~{\rm fm}^2}
+~=~
+I_H {m_e \over \mu} {a_0^2 \over {\rm fm}^2}
+\end{equation}
+
+\noindent
+Evaluating for the cases of interest
+
+\begin{table}[h!]
+
+\begin{center}
+{\begin{tabular}{ccccccc}
+channel & constant (MeV) \cr
+\hline
+d+d      & 20.7601 \cr
+3+1      & 27.6661 \cr
+p+t      & 27.6809 \cr
+n+$^3$He  & 27.6512 \cr
+\end{tabular}}
+\end{center}
+
+\end{table}
+
+\noindent
+Then the Hamiltonian is
+
+\begin{equation}
+E P
+~=~
+\bigg \lbrace
+{\hbar^2 \over 2 \mu~{\rm fm}^2} \bigg ( -{d^2 \over d \rho^2} + {1 \over \rho^2} \bigg )
++ V_C
++ V_N
+\bigg \rbrace
+P
+\end{equation}
+
+\noindent
+or
+
+\begin{equation}
+{E \over {\rm MeV}} P
+~=~
+\bigg \lbrace
+{\hbar^2 \over 2 \mu~{\rm fm}^2} \bigg ( -{d^2 \over d \rho^2} + {1 \over \rho^2} \bigg )
++ {V_C \over {\rm MeV}}
++ {V_N \over {\rm MeV}}
+\bigg \rbrace
+P
+\end{equation}
+
+\noindent
+where
+
+\begin{equation}
+\rho ~=~ {r \over {\rm fm}}
+\end{equation}
+
+\noindent
+We can take another step and define
+
+\begin{equation}
+\epsilon ~=~ {E \over {\rm MeV}}
+\ \ \ \ \ \ \
+v_N ~=~ {V_N \over {\rm MeV}}
+\ \ \ \ \ \ \
+v_C ~=~ {V_C \over {\rm MeV}}
+\end{equation}
+
+\noindent
+Then we get
+
+\begin{equation}
+\epsilon P
+~=~
+\bigg \lbrace
+{\hbar^2 \over 2 \mu~{\rm fm}^2 ~{\rm MeV}} 
+\bigg ( -{d^2 \over d \rho^2} + {1 \over \rho^2} \bigg )
++ v_C 
++ v_N 
+\bigg \rbrace
+P
+\end{equation}
+
+\noindent
+
+For the bare Coulomb interaction we have
+
+\begin{equation}
+%\begin{split}
+v_C
+~=~ 
+{1 \over {\rm MeV}~{\rm fm}} {e^2 \over 4 \pi \epsilon_0 \rho }
+$$
+$$
+%\\
+~=~
+{2 I_H \over {\rm MeV}} {a_0 \over {\rm fm}} {1 \over \rho}
+$$
+$$
+%\\
+~=~
+1.43996~ {1 \over \rho}
+%\end{split}
+\end{equation}
+
+For the discretization the thought is to use simple 3-point differencing.  We start with
+
+\begin{equation}
+\epsilon P
+~=~
+\bigg \lbrace
+A \bigg ( -{d^2 \over d \rho^2} + {1 \over \rho^2} \bigg )
++ 
+{B \over \rho} 
++ v_N 
+\bigg \rbrace
+P
+\end{equation}
+
+\noindent
+We discretize and write
+
+\begin{equation}
+\epsilon P_j
+~=~
+- A {P_{j+1} - 2 P_j + P_{j-1} \over h^2}
++
+{A \over \rho_j^2} P_j
++ 
+{B \over \rho_j} P_j 
++ 
+v_N P_j
+\end{equation}
+
+To develop a boundary condition at large $r$ we start with
+
+\begin{equation}
+E ~=~ {\hbar^2 k^2 \over 2 \mu}
+\end{equation}
+
+\noindent
+or
+
+\begin{equation}
+k ~=~ \sqrt{2 \mu E \over \hbar^2}
+\end{equation}
+
+\noindent
+For the normalized version of the problem we have
+
+\begin{equation}
+\epsilon ~=~ A \kappa^2
+\end{equation}
+
+\noindent
+or
+
+\begin{equation}
+\kappa ~=~ \sqrt{\epsilon \over A}
+\end{equation}
+
+\noindent
+and
+
+\begin{equation}
+P_{N  } ~=~ e^{i \kappa \rho_{N  }}
+\ \ \ \ \ \ \
+P_{N+1} ~=~ e^{i \kappa \rho_{N+1}}
+\end{equation}
+
+For inward integration we start with
+
+\begin{equation}
+A {P_{j-1} \over h^2}
+~=~
+- A {P_{j+1} - 2 P_j  \over h^2}
++
+{A \over \rho_j^2} P_j
++ 
+{B \over \rho_j} P_j 
++ 
+v_N P_j
+-
+\epsilon P_j
+\end{equation}
+
+\noindent
+and rewrite it as
+
+\begin{equation}
+P_{j-1} 
+~=~
+2 P_j - P_{j+1}
++
+{h^2 \over A}
+\bigg (
+{A \over \rho_j^2} 
++ 
+{B \over \rho_j}  
++ 
+v_N
+-
+\epsilon 
+\bigg )
+P_j
+\end{equation}
+
+
+To find the optimum, we select different values for Re$\lbrace \epsilon \rbrace$ and
+Im$\lbrace \epsilon \rbrace$.  One approach is to select increments and decrements in both, and pick whichever minimizes
+
+\begin{equation}
+|P_0| ~=~ \sqrt{ ({\rm Re} \lbrace P_0 \rbrace)^2 + ({\rm Im} \lbrace P_0 \rbrace)^2}
+\end{equation}
+
+\noindent
+This is equivalent to a 2-D search based on minimizing a scalar quantity.  We could start with
+
+\begin{equation}
+\epsilon ~=~ 0
+\end{equation}
+  
+\noindent
+as an initial condition on the energy.
