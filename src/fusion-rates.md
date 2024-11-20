@@ -75,7 +75,7 @@ $$\Gamma = T\gamma$$
 
 Instead of solving the Schrödinger exactly, we can apply the [WKB approximation](https://en.wikipedia.org/wiki/Quantum_tunnelling#WKB_approximation) to obtain a simpler approximate solution. This was the approach taken by [Gamow](https://web.archive.org/web/20200504014928/http://web.ihep.su/dbserv/compas/src/gamow28/eng.pdf) in 1928 which yields an analytical expression for the tunneling probability:
 
-$$T(E) = e^{-2 G} $$
+$$T = e^{-2 G} $$
 
 with the Gamow factor $G$ is given by:
 
@@ -83,11 +83,11 @@ $$G = \int_{r_1}^{r_2} \sqrt{\frac{2\mu}{\hbar^2}\left[V_{\rm eff}(r) - E\right]
 
 where the integration is inside the classically forbidden region and so $r_1$ and $r_2$ are the classical turning points for the potential barrier.
 
-The Gamow model is designed for 1D problems. However, it can be adjusted to work for realistic 3D problems by augmenting the fusion rate with a "correction factor" C. Specifically:
+The Gamow model is designed for 1D problems. However, it can be adjusted to work for realistic 3D problems by augmenting the fusion rate with a "correction factor" $C$. Specifically:
 
 $$\Gamma = CT\gamma$$
 
-where C depends on the specific fusion problem being considered.
+where $C$ depends on the specific fusion problem being considered.
 
 <!-- #region -->
 ## Potentials
