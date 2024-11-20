@@ -302,7 +302,7 @@ To get a sense of the spacing between the r points, let's visualise a subset of 
 
 ```python
 plt.figure()
-plt.plot(r_rm[::500], np.zeros_like(r_rm[::500]), '|', markersize=10, label='Points in r (subsampled)')
+plt.plot(r_fm[::500], np.zeros_like(r_fm[::500]), '|', markersize=10, label='Points in r (subsampled)')
 plt.title("Logarithmic spacing of r")
 plt.xlabel("r (fm)", fontsize=12)
 plt.yticks([])  # Remove y-axis ticks for clarity
@@ -363,7 +363,7 @@ gamow_results = []
 for state in states:
     V0, r_S, a_S, L = state["V0"], state["r_S"], state["a_S"], state["L"]
     V_eff = V_nuc(r_fm, V0, r_S, a_S) + V_cent(r_fm, L) + V_mol(r_fm)
-    G = calculate_G(r_rm,V_eff,r_start)
+    G = calculate_G(r_fm,V_eff,r_start)
     T = np.exp(-2*G)
     gamow_results.append({
         "state": state['state'],
