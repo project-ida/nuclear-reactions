@@ -13,7 +13,7 @@ jupyter:
     name: python3
 ---
 
-<a href="https://colab.research.google.com/github/project-ida/nuclear-reactions/blob/master/fusion-rates.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="https://nbviewer.jupyter.org/github/project-ida/nuclear-reactions/blob/master/fusion-rates.ipynb" target="_parent"><img src="https://nbviewer.jupyter.org/static/img/nav_logo.svg" alt="Open In nbviewer" width="100"/></a>
+<a href="https://colab.research.google.com/github/project-ida/nuclear-reactions/blob/20241119-gamow/fusion-rates.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="https://nbviewer.jupyter.org/github/project-ida/nuclear-reactions/blob/20241119-gamow/fusion-rates.ipynb" target="_parent"><img src="https://nbviewer.jupyter.org/static/img/nav_logo.svg" alt="Open In nbviewer" width="100"/></a>
 
 
 # Fusion rates
@@ -26,6 +26,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
 import pandas as pd
+from scipy.integrate import simps, trapz
 pd.set_option('display.max_rows', 300)  # or None to display an unlimited number of rows
 ```
 
@@ -36,19 +37,20 @@ amu = 1.66053906892e-27 # 1 amu in kg
 a0 = 0.529177210903e-10 # bohr radius in m
 Ry_to_eV = 13.605693122990 # 1 Rydberg in eV
 J_to_eV = 1/1.602176634e-19 # 1 Joule in eV
+eV_to_J = 1.602176634e-19 # 1 eV in Joules
 ```
 
 ```python
 # Deuterium information
 deuteron_mass = 2.013553212745 * amu
-muDD = ((deuteron_mass*deuteron_mass) / (deuteron_mass+deuteron_mass)) # reduced mass of D2
+muDD = ((deuteron_mass*deuteron_mass) / (deuteron_mass+deuteron_mass)) # reduced mass of D2 in kg
 ```
 
 ## Nuclear fusion
 
 Fusion can be described as a two step process:
 1. A quantum tunneling event through a potential barrier, with the barrier defined by the interatomic potential between two nuclei.
-2. A relaxation of the highly clustered nuclei into some ground state (with the concomitant release of energy)
+2. A relaxation or decay of the highly clustered nuclei into some ground state or decay products (with the concomitant release of energy)
 
 Step 2 is concerned with nuclear physics and proceeds at a rate $\gamma$ that's determined from experiment and is typically extremely fast (~$10^{20} s^{-1}$).
 
@@ -77,7 +79,7 @@ $$T(E) = e^{-2 G} $$
 
 with the Gamow factor $G$ is given by:
 
-$$\int_{r_1}^{r_2} \sqrt{\frac{2\mu}{\hbar^2}\left[V_{\rm eff}(r) - E\right]} \, dr$$
+$$G = \int_{r_1}^{r_2} \sqrt{\frac{2\mu}{\hbar^2}\left[V_{\rm eff}(r) - E\right]} \, dr$$
 
 where the integration is inside the classically forbidden region and so $r_1$ and $r_2$ are the classical turning points for the potential barrier.
 
@@ -99,13 +101,15 @@ For a $\rm D_2$ molecule, the interatomic potential $V(r)$ consists of 2 parts -
 
 $$V(r) = V_{\rm nuc}^{S,L}(r) + V_{\rm mol}(r)$$
 
+
+<!-- #endregion -->
+
 ### Nuclear potential
 
 We use the Woods-Saxon nuclear potential (in MeV):
 
 $$V_{\rm nuc}^{S,L}(r) ~=~ {V_0 \over 1 + e^{(r - r_S) / a_S}}$$
 
-<!-- #endregion -->
 
 ```python
 # The nuclear Woods-Saxon nuclear potential
@@ -132,7 +136,7 @@ states = [
 ]
 ```
 
-We can then see that the attractive nuclear potentials become negligible within  10 fm and  the $^1S$ state looks to be the most favourable for fusion because of its particularly deep potential well.
+We can then see that the attractive nuclear potentials become negligible within about 10 fm.
 
 ```python
 # Generate r values (distance in fm)
@@ -217,7 +221,6 @@ def V_cent(r_fm, L):
 ```
 
 ```python
-
 # Generate r values (distance in fm)
 r_fm = np.linspace(1, 10, 500)
 
@@ -280,4 +283,205 @@ ax_inset.set_yticklabels(['0','0.57'])
 # plt.savefig("total-potential-D2.png", dpi=600)
 plt.show()
 
+```
+
+## Calculating the tunneling probability $T$
+
+
+We first need to define a radial grid that has high resolution near the nucleus and lower resolution at greater distance. We do this because the potential changes a lot when we get closer to the nucleus and so when we're doing the integration for calculating the Gamow factor then we'll incur a lot of error if we don't do this.
+
+```python
+# Remember r is in fm
+Nr = 30000
+rmin = 0.03
+rmax = 500000 # this is 500pm
+r_fm = np.geomspace(rmin, rmax, Nr) # this creates a logarithmic spacing in the r points
+```
+
+To get a sense of the spacing between the r points, let's visualise a subset of the points.
+
+```python
+plt.figure()
+plt.plot(r_rm[::500], np.zeros_like(r_rm[::500]), '|', markersize=10, label='Points in r (subsampled)')
+plt.title("Logarithmic spacing of r")
+plt.xlabel("r (fm)", fontsize=12)
+plt.yticks([])  # Remove y-axis ticks for clarity
+plt.grid(True, which="both", linestyle="--", linewidth=0.5)
+plt.legend()
+plt.tight_layout()
+plt.show()
+```
+
+Now, we will define a function to do the integration that's required to calculate the Gamow factor:
+
+$$G = \int_{r_1}^{r_2} \sqrt{\frac{2\mu}{\hbar^2}\left[V_{\rm eff}(r) - E\right]} \, dr$$
+
+Conceptually, we'll imagine that we can place the deuterons at a specific starting separation $r_{\rm start}$. This starting separation will imbue the deuterons with an energy $E$ that matches the effective potential at that separation. In other words, $E = V_{\rm eff}$, the deuterons are stationary and the they start off at one of the classical turning points $r_{\rm start} = r_{2}$. We then have to integrate down to $r_1$ by finding the other turning point $r_1$ where $E = V_{\rm eff} $.
+
+```python
+def calculate_G(r, V, r_start):
+    
+    # Particles are separated by r_start. 
+    # The energy, E, that the particles must have to be at r_start is V(r_start)
+    r_start_index = np.where(r > r_start)[0][0]
+    E = V[r_start_index]
+
+    # The Gamow factor is calculated based on integrating V-E between the classical turning points.
+    V_minus_E = V - E
+    
+    # We don't have to explicitly calculate the turning points. We can instead integrate from
+    # r_start down to some small radius within the nuclear potential well, e.g. 5 fm.
+    # We can do this by zeroing out the negative values of V-E in that range.
+
+    V_minus_E = np.maximum(V_minus_E, 0) # negative values of V_minus_E are set to 0
+    
+    # Determine index of r = 5 fm where we'll cut-off the integration from below
+    r_5fm_index = np.where(r > 5)[0][0]
+    
+    # Create the slice of r and V_minus_E in which we'll do the integration
+    r_slice = r[r_5fm_index:r_start_index]
+    V_minus_E_slice = V_minus_E[r_5fm_index:r_start_index]
+    
+
+    # Perform the integration using the trapezoidal rule
+    integral = trapz(np.sqrt(V_minus_E_slice), r_slice)
+
+    # Compute the Gamow factor, remembering to convert everything back to SI units
+    # fm -> m needs factor 1e-15
+    # MeV -> J needs factor np.sqrt(1e6 * eV_to_J) - Remember V-E is under a square root in the integral
+    G = np.sqrt((2 * muDD) / (hbar**2)) * integral * 1e-15 * np.sqrt(1e6 * eV_to_J)
+
+    return G
+```
+
+Now, we're ready to calculate the tunneling probabilities for the different $\rm D_2$ states. We just have to choose a starting separation for the deuterons. We'll start with the equilibrium separation in gas, i.e. 74pm.
+
+```python
+r_start = 74000
+gamow_results = []
+
+for state in states:
+    V0, r_S, a_S, L = state["V0"], state["r_S"], state["a_S"], state["L"]
+    V_eff = V_nuc(r_fm, V0, r_S, a_S) + V_cent(r_fm, L) + V_mol(r_fm)
+    G = calculate_G(r_rm,V_eff,r_start)
+    T = np.exp(-2*G)
+    gamow_results.append({
+        "state": state['state'],
+        "$G$": G,
+        "$T=e^{-2G}$": T
+    })
+
+# Convert the list of dictionaries to a DataFrame
+gamow_results = pd.DataFrame(gamow_results)
+
+# Display the DataFrame
+gamow_results
+```
+
+In order to calculate the fusion rate $\Gamma$, we now need to come back and look at the correction factor $C$ and the the nuclear relaxation/decay rate $\gamma$ in:
+
+$$\Gamma = CT\gamma$$
+
+
+## Volume correction factor for $D_2$
+
+In order to apply the Gamow model in 3D, we need to multiply the fusion rate by by a "correction factor". For the $\rm D_2$ fusion problem, this correction factor is the ratio of the nuclear volume to molecular volume  ${v_{nuc} / v_{mol}}$.
+
+The ratio depends slightly on the state of the $\rm D_2$ molecules. To estimate the ratio, we begin by defining the equilibrium bond lengths for different electronic states of a $ \text{D}_2 $ molecule in terms of the Bohr radius ($ a_0 $):
+
+- For the S state: $ R_{0S} = 1.401080 \times a_0 $
+- For the P state: $ R_{0P} = R_{0S} + 0.001 \times 10^{-10} \, \text{m} $
+- For the D state: $ R_{0D} = R_{0S} + 0.002 \times 10^{-10} \, \text{m} $
+
+Next, we calculate the de Broglie wavelength of the relative motion ($ \Delta R $) using the formula:
+
+$$
+\Delta R = a_0 \sqrt{\frac{I_H}{\hbar \omega_{0DD}}} \sqrt{\frac{2 m_e c^2}{M_{D} c^2}}
+$$
+
+where $ I_H $ is the ionization potential of hydrogen in eV, $ \hbar \omega_{0DD} $ is the zero-point energy (0.3862729 eV), $ m_e c^2 $ is the electron mass in MeV, and $ M_D c^2 $ is the deuteron mass in MeV.
+
+The molecular volumes ($ v_{mol} $) for the S, P, and D states are computed as follows:
+
+- S: $ v_{mol} = 2 \pi R_{0S} \left(\pi \Delta R^2\right) $
+- P: $ v_{mol} = 2 \pi R_{0P} \left(\pi \Delta R^2\right) $
+- D: $ v_{mol} = 2 \pi R_{0D} \left(\pi \Delta R^2\right) $
+
+The nuclear volume ($ v_{nuc} $) of the deuterium nucleus is calculated assuming a spherical shape with a radius of 5 fm:
+
+$$
+v_{nuc} = \frac{4}{3} \pi \left(5 \times 10^{-15} \, \text{m}\right)^3
+$$
+
+Finally, the volume ratios of the nuclear volume to the molecular volume for the S, P, and D states are calculated as:
+
+- S: $ \frac{v_{nuc}}{v_{mol}} = 6.66 \times 10^{-12} $
+- P: $ \frac{v_{nuc}}{v_{mol}} = 6.65 \times 10^{-12} $
+- D: $ \frac{v_{nuc}}{v_{mol}} = 6.64 \times 10^{-12} $
+
+```python
+gamow_results["$v_{nuc}/v_{mol}$"] = [6.66e-12, 6.66e-12, 6.65e-12, 6.64e-12]
+gamow_results
+```
+
+## Nuclear relaxation/decay for $\rm D_2$ fusion
+
+When the deuterons tunnel through the Coulomb barrier, for a very brief moment, they form a highly clustered state that can be recognised as an excited state of $\rm ^4He$ (often denoted $\rm ^4He^*$). There are several excited states and they decay via different "channels". For example:
+- Relaxation into the ground state $\rm ^4He$ with the emission of a gamma ray
+- Decay into a proton and triton
+- Decay into a neutron and $\rm ^3He$
+
+Different $\rm D_2$ states tunnel to different $\rm ^4He^*$ states which have unique decay rates $\gamma$. The rates can be found in Table 3.0.1 (page 19) of [Tilley et.al](https://www.sciencedirect.com/science/article/abs/pii/037594749290635W).
+
+<!-- #region -->
+For the $^3P$ state of $\rm D_2$, we must refer to the $\rm ^3P$ $J^\pi=1^-$ state of $\rm ^4He^*$ at 28.37 MeV, whose line width is:
+
+$$
+\hbar \gamma_{^3P} ~=~ 0.07 + 0.08~\text{MeV} ~=~ 0.15~ \text{MeV}
+$$
+
+
+and whose associated decay rate and lifetime is:
+
+$$
+\gamma_{^3P} ~=~ {0.15 ~ {\rm MeV} \over \hbar} ~=~ 2.3 \times 10^{20}~{\rm s}^{-1}
+$$
+$$
+\tau_{^3P} ~=~ {\hbar \over 0.15 ~ {\rm MeV} } ~=~ 4.4 \times 10^{-21} ~{\rm sec} 
+$$
+<!-- #endregion -->
+
+<!-- #region -->
+For the $^5S$ state of $\rm D_2$, we must refer to the $\rm ^5S$ $J^\pi=2^+$ state of $\rm ^4He^*$ at 27.42 MeV, whose line width is:
+
+$$
+\hbar \gamma_{^5S} ~=~ 0.25 + 0.23~\text{MeV} ~=~ 0.48~ \text{MeV}
+$$
+
+
+and whose associated decay rate and lifetime is:
+
+$$
+\gamma_{^5S} ~=~ {0.48 ~ {\rm MeV} \over \hbar} ~=~ 7.3 \times 10^{20}~{\rm s}^{-1}
+$$
+$$
+\tau_{^5S} ~=~ {\hbar \over 0.48 ~ {\rm MeV} } ~=~ 1.4 \times 10^{-21} ~{\rm sec} 
+$$
+
+<!-- #endregion -->
+
+```python
+gamow_results["$\gamma$"] = [7.3e20, 7.3e20, 2.3e20, 7.3e20]
+gamow_results
+```
+
+## Calculating the fusion rates
+
+Now we have everything we need to calculate the fusion rates via
+
+$$\Gamma = \frac{v_{nuc}}{v_{mol}}T\gamma$$
+
+```python
+gamow_results["$\Gamma$"] = gamow_results["$v_{nuc}/v_{mol}$"]*gamow_results["$T=e^{-2G}$"]*gamow_results["$\gamma$"]
+gamow_results
 ```
