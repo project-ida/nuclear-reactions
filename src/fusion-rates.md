@@ -434,7 +434,31 @@ When the deuterons tunnel through the Coulomb barrier, for a very brief moment, 
 Different $\rm D_2$ states tunnel to different $\rm ^4He^*$ states which have unique decay rates $\gamma$. The rates can be found in Table 3.0.1 (page 19) of [Tilley et.al](https://www.sciencedirect.com/science/article/abs/pii/037594749290635W).
 
 <!-- #region -->
-For the $^3P$ state of $\rm D_2$, we must refer to the $\rm ^3P$ $J^\pi=1^-$ state of $\rm ^4He^*$ at 28.37 MeV, whose line width is:
+**For the $^5S$ state of $\rm D_2$**:
+
+We must refer to the $\rm ^5S$ $J^\pi=2^+$ state of $\rm ^4He^*$ at 27.42 MeV, whose line width is:
+
+$$
+\hbar \gamma_{^5S} ~=~ 0.25 + 0.23~\text{MeV} ~=~ 0.48~ \text{MeV}
+$$
+
+
+and whose associated decay rate and lifetime is:
+
+$$
+\gamma_{^5S} ~=~ {0.48 ~ {\rm MeV} \over \hbar} ~=~ 7.3 \times 10^{20}~{\rm s}^{-1}
+$$
+$$
+\tau_{^5S} ~=~ {\hbar \over 0.48 ~ {\rm MeV} } ~=~ 1.4 \times 10^{-21} ~{\rm sec} 
+$$
+
+We don't have data for the $^1S$ state, so we'll use the $^5S$ result.
+<!-- #endregion -->
+
+<!-- #region -->
+**For the $^3P$ state of $\rm D_2$**:
+
+We must refer to the $\rm ^3P$ $J^\pi=1^-$ state of $\rm ^4He^*$ at 28.37 MeV, whose line width is:
 
 $$
 \hbar \gamma_{^3P} ~=~ 0.07 + 0.08~\text{MeV} ~=~ 0.15~ \text{MeV}
@@ -452,26 +476,28 @@ $$
 <!-- #endregion -->
 
 <!-- #region -->
-For the $^5S$ state of $\rm D_2$, we must refer to the $\rm ^5S$ $J^\pi=2^+$ state of $\rm ^4He^*$ at 27.42 MeV, whose line width is:
+**For the $^5D$ state of $\rm D_2$**:
+
+We must refer to the $\rm ^5D$ $J^\pi=2^+$ state of $\rm ^4He^*$ at 29.89 MeV, whose line width is:
 
 $$
-\hbar \gamma_{^5S} ~=~ 0.25 + 0.23~\text{MeV} ~=~ 0.48~ \text{MeV}
+\hbar \gamma_{^5D} ~=~ 0.04 + 0.04~\text{MeV} ~=~ 0.08~ \text{MeV}
 $$
 
 
 and whose associated decay rate and lifetime is:
 
 $$
-\gamma_{^5S} ~=~ {0.48 ~ {\rm MeV} \over \hbar} ~=~ 7.3 \times 10^{20}~{\rm s}^{-1}
+\gamma_{^5D} ~=~ {0.08 ~ {\rm MeV} \over \hbar} ~=~ 1.2 \times 10^{20}~{\rm s}^{-1}
 $$
 $$
-\tau_{^5S} ~=~ {\hbar \over 0.48 ~ {\rm MeV} } ~=~ 1.4 \times 10^{-21} ~{\rm sec} 
+\tau_{^5D} ~=~ {\hbar \over 0.08 ~ {\rm MeV} } ~=~ 8.2 \times 10^{-21} ~{\rm sec} 
 $$
 
 <!-- #endregion -->
 
 ```python
-gamow_results["$\gamma$"] = [7.3e20, 7.3e20, 2.3e20, 7.3e20]
+gamow_results["$\gamma$"] = [7.3e20, 7.3e20, 2.3e20, 1.2e20]
 gamow_results
 ```
 
