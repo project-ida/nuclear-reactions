@@ -54,15 +54,17 @@ Fusion can be described as a two step process:
 
 Step 2 is concerned with nuclear physics and proceeds at a rate $\gamma$ that's determined from experiment and is typically extremely fast (~$10^{20} s^{-1}$).
 
-Step 1 is concerned with solving the Schrödinger equation for the radial wavefunction $R(r)$ that describes the distance, $r$, between the two nuclei:
+Step 1 is concerned with solving the [reduced radial Schrödinger equation](https://physics.weber.edu/schroeder/quantum/RadialEquation.pdf) for $u(r)$ that describes the distance, $r$, between the two nuclei:
 
-$$-\frac{\hbar^2}{2\mu} \frac{d^2 R(r)}{dr^2} +  V_{\rm eff}(r) R(r) = E R(r)$$
+$$-\frac{\hbar^2}{2\mu} \frac{d^2 u(r)}{dr^2} +  V_{\rm eff}(r) u(r) = E u(r)$$
 
 with $$V_{\rm eff}(r) = V(r) + \frac{L(L+1)\hbar^2}{2\mu r^2}$$
 
-where $\mu$ is the reduced mass of the nuclei, $V(r)$ is the interatomic potential and $\frac{L(L+1)\hbar^2}{2\mu r^2}$ is the centripetal potential associated with the orbital angular momentum, $L$, of the nuclei with respect to one another.
+where $\mu$ is the reduced mass of the nuclei, $V(r)$ is the interatomic potential and $\frac{L(L+1)\hbar^2}{2\mu r^2}$ is the centripetal potential associated with the orbital angular momentum, $L$, of the nuclei with respect to one another. 
 
-A tunneling probability $T$ can then be calculated based on integrating $|R(r)|^2$ over the classically forbidden region where the two nuclei don't have sufficient energy to overcome the barrier.
+Note that the total wavefunction $\psi(r, \theta, \phi) = R(r) Y_l^m(\theta, \phi)$ and the "reduced radial wavefunction" is $u(r) = rR(r)$.
+
+A tunneling probability $T$ can then be calculated based on integrating $|u(r)|^2$ over the classically forbidden region where the two nuclei don't have sufficient energy to overcome the barrier.
 
 The fusion rate can then be simply written as 
 
