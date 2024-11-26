@@ -64,20 +64,22 @@ where $\mu$ is the reduced mass of the nuclei, $V(r)$ is the interatomic potenti
 
 Note that the total wavefunction $\psi(r, \theta, \phi) = R(r) Y_l^m(\theta, \phi)$ and the "reduced radial wavefunction" is $u(r) = rR(r)$.
 
-A tunneling probability $T$ can then be calculated based on integrating $|u(r)|^2$ over the classically forbidden region where the two nuclei don't have sufficient energy to overcome the barrier.
+A tunneling probability $P$ can then be calculated based on integrating $|\psi|^2$ over the nuclear scale region (typically a few fm from the origin). This results in: 
+
+$$P = \frac{\int_{nuc} |R|^2 r^2dr}{\int_{mol} |R|^2 r^2dr}$$
 
 The fusion rate can then be simply written as 
 
-$$\Gamma = T\gamma$$
+$$\Gamma = P\gamma$$
 
 
 
 
 ## The Gamow model
 
-Instead of solving the Schrödinger exactly, we can apply the [WKB approximation](https://en.wikipedia.org/wiki/Quantum_tunnelling#WKB_approximation) to obtain a simpler approximate solution. This was the approach taken by [Gamow](https://web.archive.org/web/20200504014928/http://web.ihep.su/dbserv/compas/src/gamow28/eng.pdf) in 1928 which yields an analytical expression for the tunneling probability:
+Instead of solving the Schrödinger exactly, we can can apply the [WKB approximation](https://en.wikipedia.org/wiki/Quantum_tunnelling#WKB_approximation) to obtain a simpler approximate solution. This was the approach taken by [Gamow](https://web.archive.org/web/20200504014928/http://web.ihep.su/dbserv/compas/src/gamow28/eng.pdf) in 1928 who found an analytical expression relating the the amplitude of the wave functions on either side of a barrier. For our problem, we'd write it as:
 
-$$T = e^{-2 G} $$
+$$\frac{|R_{nuc}|}{|R_{mol}|} =e^{-G} $$
 
 with the Gamow factor $G$ is given by:
 
@@ -85,11 +87,11 @@ $$G = \int_{r_1}^{r_2} \sqrt{\frac{2\mu}{\hbar^2}\left[V_{\rm eff}(r) - E\right]
 
 where the integration is inside the classically forbidden region and so $r_1$ and $r_2$ are the classical turning points for the potential barrier.
 
-The Gamow model is designed for 1D problems. However, it can be adjusted to work for realistic 3D problems by augmenting the fusion rate with a "correction factor" $C$. Specifically:
+If we assume a constant radial probability density $R$, then the associated tunneling probability is:
 
-$$\Gamma = CT\gamma$$
+$$P = \frac{v_{nuc}}{v_{mol}}e^{-2 G} $$
 
-where $C$ depends on the specific fusion problem being considered.
+where ${v_{nuc} / v_{mol}}$ is the ratio of the nuclear volume to molecular volumes that arrises from the volume integration.
 
 <!-- #region -->
 ## Potentials
@@ -385,11 +387,9 @@ In order to calculate the fusion rate $\Gamma$, we now need to come back and loo
 $$\Gamma = CT\gamma$$
 
 
-## Volume correction factor for $D_2$
+## Volume factor for $D_2$
 
-In order to apply the Gamow model in 3D, we need to multiply the fusion rate by by a "correction factor". For the $\rm D_2$ fusion problem, this correction factor is the ratio of the nuclear volume to molecular volume  ${v_{nuc} / v_{mol}}$.
-
-The ratio depends slightly on the state of the $\rm D_2$ molecules. To estimate the ratio, we begin by defining the equilibrium bond lengths for different electronic states of a $ \text{D}_2 $ molecule in terms of the Bohr radius ($ a_0 $):
+The ratio of the nuclear volume to molecular volume, ${v_{nuc} / v_{mol}}$, depends slightly on the state of the $\rm D_2$ molecules. To estimate the ratio, we begin by defining the equilibrium bond lengths for different electronic states of a $ \text{D}_2 $ molecule in terms of the Bohr radius ($ a_0 $):
 
 - For the S state: $ R_{0S} = 1.401080 \times a_0 $
 - For the P state: $ R_{0P} = R_{0S} + 0.001 \times 10^{-10} \, \text{m} $
