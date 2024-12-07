@@ -32,6 +32,8 @@ pd.set_option('display.max_rows', 300)  # or None to display an unlimited number
 
 ```python
 # Constants
+e = 1.602176634e-19 # charge on the electron
+eps0 = 8.85418782e-12 # permitivity of free space
 hbar = 1.054571817e-34
 amu = 1.66053906892e-27 # 1 amu in kg
 a0 = 0.529177210903e-10 # bohr radius in m
@@ -47,6 +49,7 @@ muDD = ((deuteron_mass*deuteron_mass) / (deuteron_mass+deuteron_mass)) # reduced
 ```
 
 ## Nuclear fusion
+
 
 Fusion can be described as a two step process:
 1. A quantum tunneling event through a potential barrier, with the barrier defined by the interatomic potential between two nuclei.
@@ -77,6 +80,7 @@ $$\Gamma = P\gamma$$
 
 ## The Gamow model
 
+
 Instead of solving the Schrödinger exactly, we can can apply the [WKB approximation](https://en.wikipedia.org/wiki/Quantum_tunnelling#WKB_approximation) to obtain a simpler approximate solution. This was the approach taken by [Gamow](https://web.archive.org/web/20200504014928/http://web.ihep.su/dbserv/compas/src/gamow28/eng.pdf) in 1928 who found an analytical expression relating the the amplitude of the wave functions on either side of a barrier. For our problem, we'd write it as:
 
 $$\frac{|R_{nuc}|}{|R_{mol}|} =e^{-G} $$
@@ -93,9 +97,10 @@ $$P = \frac{v_{nuc}}{v_{mol}}e^{-2 G} $$
 
 where ${v_{nuc} / v_{mol}}$ is the ratio of the nuclear volume to molecular volumes that arrises from the volume integration.
 
-<!-- #region -->
+
 ## Potentials
 
+<!-- #region -->
 The effective potential includes the interatomic potential and the centripetal potential:
 
 $$V_{\rm eff}(r) = V(r) + \frac{L(L+1)\hbar^2}{2\mu r^2}$$
@@ -118,7 +123,8 @@ $$V_{\rm nuc}^{S,L}(r) ~=~ {V_0 \over 1 + e^{(r - r_S) / a_S}}$$
 ```python
 # The nuclear Woods-Saxon nuclear potential
 def V_nuc(r, V0, r_S, a_S):
-    return V0 / (1 + np.exp((r - r_S) / a_S))
+    r_safe = np.minimum(r, 100) # Prevents overflow errors in the exponential when r is in the pm range
+    return V0 / (1 + np.exp((r_safe - r_S) / a_S))
 ```
 
 The parameters depend on the total spin ($S$) and orbital ($L$) angular momenta of the nuclei as seen below and can be found in [Tomusiak et.al](http://dx.doi.org/10.1103/physrevc.52.1963).
@@ -190,22 +196,81 @@ def V_mol(r_fm):
 ```
 
 ```python
-
 # Range for r in pm for plotting and fm for the potential functions
 r_pm = np.linspace(25, 500, 500)
 r_fm = r_pm*1000
 
 # Calculate V_mol in MeV
-V_values = V_mol(r_fm)
+V_mol_values = V_mol(r_fm)
 
 # Plot
 plt.figure()
-plt.plot(r_pm, V_values*1e6, label=r"$V_{mol}(r)$")
+plt.plot(r_pm, V_mol_values*1e6, label=r"$V_{mol}(r)$")
 plt.xlabel(r"$r$ (pm)")
 plt.ylabel(r"$V_{mol}$ (eV)")
 # plt.savefig("mol-potential-D2.png", dpi=600)
 plt.show()
 ```
+
+We can see how much energy the deuterons have in their equilibrium position of 74 pm:
+
+```python
+V_mol(74000)*1e6
+```
+
+To put this approximately $-5 \, \rm eV$ into perspective, we need to compare it with the energy that two deuterons would have in the absence of any binding electrons - i.e. the "bare" Coulomb potential. 
+
+
+### Coulomb potential
+
+Without the electrons the electrostatic potential between the deuterons is given by:
+
+$$V_{\rm coulomb} = \frac{e^2}{4\pi\epsilon_0r}$$
+
+```python
+# Coulomb potential in MeV with r in fm
+def V_coulomb(r_fm):
+    return e**2/(4 * np.pi * eps0 * r_fm*1e-15) * J_to_eV / 1e6
+```
+
+Let's plot $V_{\rm coulomb}$ and $V_{\rm mol}$ on the same scale for easy comparison.
+
+```python
+# Range for r in pm for plotting and fm for the potential functions
+r_pm = np.linspace(25, 500, 500)
+r_fm = r_pm*1000
+
+# Calculate V_mol in MeV
+V_coulomb_values = V_coulomb(r_fm)
+
+# Calculate V_mol in MeV
+V_mol_values = V_mol(r_fm)
+
+# Plot
+plt.figure()
+plt.plot(r_pm, V_mol_values*1e6, label=r"$V_{mol}$")
+plt.plot(r_pm, V_coulomb_values*1e6, label=r"$V_{coulomb}$")
+plt.xlabel(r"$r$ (pm)")
+plt.ylabel(r"$V}$ (eV)")
+plt.axvline(x=74, color="grey", linestyle='--', linewidth=1)
+plt.legend()
+# plt.savefig("mol-coulomb-potential-D2.png", dpi=600)
+plt.show()
+```
+
+Although the effect of the electrons is in general complicated, we can see that overall the electrons act to lower the bare Coulomb potential. If we take 74 pm as a representative separation of the deuterons in the molecule, then we can roughly say that the electrons have lowered the coulomb barrier by an amount:
+
+```python
+(V_coulomb(74000) - V_mol(74000))*1e6 # this is in eV
+```
+
+The lower the Coulomb barrier, the closer the deuterons can get before they need to start tunneling.
+
+This approximately $25 \, \rm eV$ might not seem like a lot, but because of the exponentially sensitive nature of the Gamow factor it has an outsized impact.
+
+
+This effect of the electrons is often called "electron screening" in the sense that the electrons screen the repulsion between the nuclei. The details are complicated and without a first-principles description at low energies. Phenomenological models have been created and we will use one later in the notebook when calculating fusion rates of deuterium in metal lattices.
+
 
 ### Centripetal potential
 
@@ -289,7 +354,7 @@ plt.show()
 
 ```
 
-## Calculating the tunneling probability $T$
+## Calculating the Gamow factor $G$
 
 
 We first need to define a radial grid that has high resolution near the nucleus and lower resolution at greater distance. We do this because the potential changes a lot when we get closer to the nucleus and so when we're doing the integration for calculating the Gamow factor then we'll incur a lot of error if we don't do this.
@@ -358,36 +423,36 @@ def calculate_G(r, V, r_start):
     return G
 ```
 
-Now, we're ready to calculate the tunneling probabilities for the different $\rm D_2$ states. We just have to choose a starting separation for the deuterons. We'll start with the equilibrium separation in gas, i.e. 74pm.
+Now, we're ready to calculate the Gamow factor for the different $\rm D_2$ states. We just have to choose a starting separation for the deuterons. We'll start with the equilibrium separation in gas, i.e. 74pm.
 
 ```python
 r_start = 74000
-gamow_results = []
+gamow_74 = []
 
 for state in states:
-    V0, r_S, a_S, L = state["V0"], state["r_S"], state["a_S"], state["L"]
-    V_eff = V_nuc(r_fm, V0, r_S, a_S) + V_cent(r_fm, L) + V_mol(r_fm)
-    G = calculate_G(r_fm,V_eff,r_start)
-    T = np.exp(-2*G)
-    gamow_results.append({
+    V_eff = V_nuc(r_fm, state["V0"], state["r_S"], state["a_S"]) + V_cent(r_fm, state["L"]) + V_mol(r_fm)
+    G = calculate_G(r_fm, V_eff, r_start)
+    exp2G = np.exp(-2*G)
+    gamow_74.append({
         "state": state['state'],
         "$G$": G,
-        "$T=e^{-2G}$": T
+        "$e^{-2G}$": exp2G
     })
 
 # Convert the list of dictionaries to a DataFrame
-gamow_results = pd.DataFrame(gamow_results)
+gamow_74 = pd.DataFrame(gamow_74)
 
 # Display the DataFrame
-gamow_results
+gamow_74
 ```
 
-In order to calculate the fusion rate $\Gamma$, we now need to come back and look at the correction factor $C$ and the the nuclear relaxation/decay rate $\gamma$ in:
+In order to calculate the fusion rate $\Gamma$, we now need to come back calculate the volume factor and the the nuclear relaxation/decay rate $\gamma$ in:
 
-$$\Gamma = CT\gamma$$
+$$P = \frac{v_{nuc}}{v_{mol}}e^{-2 G}\gamma$$
 
 
 ## Volume factor for $D_2$
+
 
 The ratio of the nuclear volume to molecular volume, ${v_{nuc} / v_{mol}}$, depends slightly on the state of the $\rm D_2$ molecules. To estimate the ratio, we begin by defining the equilibrium bond lengths for different electronic states of a $ \text{D}_2 $ molecule in terms of the Bohr radius ($ a_0 $):
 
@@ -422,11 +487,15 @@ Finally, the volume ratios of the nuclear volume to the molecular volume for the
 - D: $ \frac{v_{nuc}}{v_{mol}} = 6.64 \times 10^{-12} $
 
 ```python
-gamow_results["$v_{nuc}/v_{mol}$"] = [6.66e-12, 6.66e-12, 6.65e-12, 6.64e-12]
-gamow_results
+for i, ratio in enumerate([6.66e-12, 6.66e-12, 6.65e-12, 6.64e-12]):
+    states[i]["$v_{nuc}/v_{mol}$"] = ratio
+    gamow_74.loc[i,"$v_{nuc}/v_{mol}$"] = ratio
+
+gamow_74
 ```
 
 ## Nuclear relaxation/decay for $\rm D_2$ fusion
+
 
 When the deuterons tunnel through the Coulomb barrier, for a very brief moment, they form a highly clustered state that can be recognised as an excited state of $\rm ^4He$ (often denoted $\rm ^4He^*$). There are several excited states and they decay via different "channels". For example:
 - Relaxation into the ground state $\rm ^4He$ with the emission of a gamma ray
@@ -499,17 +568,280 @@ $$
 <!-- #endregion -->
 
 ```python
-gamow_results["$\gamma$"] = [7.3e20, 7.3e20, 2.3e20, 1.2e20]
-gamow_results
+for i, gamma in enumerate([7.3e20, 7.3e20, 2.3e20, 1.2e20]):
+    states[i]["gamma"] = gamma
+    gamow_74.loc[i,"$\gamma$"] = gamma
+
+gamow_74
 ```
 
-## Calculating the fusion rates
+## Calculating the fusion rates for 74pm separation
+
 
 Now we have everything we need to calculate the fusion rates via
 
-$$\Gamma = \frac{v_{nuc}}{v_{mol}}T\gamma$$
+$$\Gamma = \frac{v_{nuc}}{v_{mol}}e^{-2G}\gamma$$
 
 ```python
-gamow_results["$\Gamma$"] = gamow_results["$v_{nuc}/v_{mol}$"]*gamow_results["$T=e^{-2G}$"]*gamow_results["$\gamma$"]
-gamow_results
+gamow_74["$\Gamma$"] = gamow_74["$v_{nuc}/v_{mol}$"]*gamow_74["$e^{-2G}$"]*gamow_74["$\gamma$"]
+gamow_74
+```
+
+It's instructive to compare the Gamow based fusion rates to those calculated by solving the Schrödinger equation fully. One of the earliest calculations was done by [Koonin and Nauenberg in 1989](https://www.nature.com/articles/339690a0). They calculated a fusion rate for an $S$ state using the molecular potential and neglecting the nuclear potential. 
+
+Their rate was calculated to be $\Gamma = 3 \times 10^{-64} \, \rm s^{-1}$
+
+Although the Gamow rate is 3 orders of magnitude below the more accurate value, the Gamow approach allows us to incorporate screening effects more easily. We'll see this later in the notebook.
+
+
+## Fusion rates as a function of deuteron separation
+
+
+In $\rm D_2$ gas, the deuteron separation is about 74 pm. When deuterium interacts with metals like palladium, the separation can be very different. For example, deuterons in the "O-sites" of a palladium lattice are separated by 250 pm, whereas the separation in "di-hydrogen" bound to palladium is 85 pm . It's therefore of interest to calculate the fusion rate as a function of deuteron separation.
+
+In general, it's not possible to vary just the deuteron separation because one must also self-consistently solve for the electron screening effects that permits the desired deuteron separation.
+
+As a first approximation, we can calculate the fusion rate using the bare Coulomb potential instead of the molecular one and then normalise it to the Koonin and Nauenberg rate at 74 pm. That will give us an order of magnitude sense for how we might expect the fusion rate to change as the deuteron separation changes. This involves repeating what we did above but for different values of $r_2$ in the Gamow factor calculation:
+
+$$G = \int_{r_1}^{r_2} \sqrt{\frac{2\mu}{\hbar^2}\left[V_{\rm eff}(r) - E\right]} \, dr$$
+
+keeping in mind that we'll now be using $V_{\rm coulomb}$ instead of $V_{\rm mol}$.
+
+
+We'll consider the $^5S$ state for this demonstration.
+
+```python
+state_5S = states[1]
+state_5S
+```
+
+```python
+r2s = np.arange(50000, 300000, 1000)
+gamow_many_r = []
+
+for r_start in r2s:
+    V_eff = V_nuc(r_fm, state_5S["V0"], state_5S["r_S"], state_5S["a_S"]) + V_cent(r_fm, state_5S["L"]) + V_coulomb(r_fm)
+    G = calculate_G(r_fm, V_eff, r_start)
+    exp2G = np.exp(-2*G)
+    Gamma = state_5S["$v_{nuc}/v_{mol}$"] * exp2G * state_5S["gamma"]
+    gamow_many_r.append({
+        "$r_2$": r_start,
+        "$G$": G,
+        "$e^{-2G}$": exp2G,
+        "$\Gamma$": Gamma
+    })
+
+# Convert the list of dictionaries to a DataFrame
+gamow_many_r = pd.DataFrame(gamow_many_r)
+
+# Display the first few rows of the DataFrame
+gamow_many_r.head()
+```
+
+Now, normalising to the Koonin value
+
+```python
+Koonin_norm = 3e-64/gamow_many_r[gamow_many_r["$r_2$"]==74000]["$\Gamma$"].values[0]
+gamow_many_r["$\Gamma$ (normalised)"] = gamow_many_r["$\Gamma$"]*Koonin_norm
+```
+
+```python
+plt.plot(gamow_many_r["$r_2$"]/1e3, gamow_many_r["$\Gamma$ (normalised)"])
+
+# Closest values to 74000 and 250000
+target_values = [74000, 250000]
+closest_points = gamow_many_r.iloc[[abs(gamow_many_r["$r_2$"] - target).idxmin() for target in target_values]]
+
+# Adding vertical and horizontal lines for the closest points
+for _, row in closest_points.iterrows():
+    r_value = row["$r_2$"]
+    gamma_value = row["$\Gamma$ (normalised)"]
+    # Vertical line from bottom to the curve
+    plt.plot([r_value / 1e3, r_value / 1e3], [1e-170, gamma_value], color='gray', linestyle='--')
+    # Horizontal line from the vertical line to the y-axis
+    plt.plot([0, r_value / 1e3], [gamma_value, gamma_value], color='gray', linestyle='--')
+
+plt.yscale('log')  # Set the y-axis to logarithmic scale
+plt.yticks([1e-40,1e-60,1e-80, 1e-100, 1e-120, 1e-140, 1e-160])
+
+plt.xlabel('Interatomic distance (pm)')
+plt.ylabel('Fusion rate (s$^{-\mathregular{1}}$)')
+
+plt.xlim(left=gamow_many_r["$r_2$"].min()/1e3)
+
+plt.ylim(ymin=1e-170)
+
+plt.tight_layout()
+
+plt.show()
+# plt.savefig("fusion-rate-distance.png", dpi=600)
+
+# # COMMENTED OUT CODE CAN BE USED TO REPRODUCE THE FORMAT OF PLOTS FROM https://doi.org/10.1088/1367-2630/ad091c
+# fig, ax = plt.subplots(figsize=(8, 6))
+# plt.yticks([1e-40,1e-60,1e-80, 1e-100, 1e-120, 1e-140, 1e-160], [f"{tick:.0E}" for tick in y_ticks])
+# plt.xlabel('Interatomic distance (pm)', fontsize=25, fontname='Arial')
+# plt.ylabel('Fusion rate (s$^{-\mathregular{1}}$)', fontsize=25, fontname='Arial')
+# plt.xticks(fontsize=25, fontname='Arial')
+# plt.yticks(fontsize=25, fontname='Arial')
+# plt.gca().invert_xaxis()
+# ax = plt.gca()
+# ax.spines['top'].set_visible(False)
+# ax.spines['right'].set_visible(False)
+```
+
+From the above plot, we can see that the fusion rate for deuterium in palladium O-sites (at 250 pm) is about 82 orders of magnitude smaller than for $\rm D_2$ in a gas.
+
+
+## Screened fusion rates
+
+
+We know that $\rm D_2$ can get absorbed into metals like Palladium. The abundance of electrons inside a metal invites us to consider more deeply the effect of electron screening on fusion rates. 
+
+Simplistically, electron screening reduces the positive electrostatic repulsion between nuclei and results in a reduced interatomic distance and hence higher fusion rates. Most theoretical descriptions of screening in metals have been developed to attempt to explain anomalously high fusion rates in low energy beam-target experiments (see e.g. [Huke et.al](http://dx.doi.org/10.1103/PhysRevC.78.015803)). These models have had some success, but there are still discrepancies with experiments and a rigorous theory of the extremely low energy regime has yet to be agreed upon.
+
+We will construct a screening model that incorporates aspects of the molecular potential we've used for $\rm D_2$ in addition to the standard screening ideas from the beam-target scenario.
+
+The simplest model of screening for the beam-target scenario takes the form of a screened Coulomb potential:
+
+$$V_{\rm screened} = \frac{e^2}{4\pi\epsilon_0r} e^{-\frac{r}{\lambda}}$$
+
+$\lambda$ is known as the screening length and gives a measure of the size of an electron cloud surrounding a nucleus. The screening length can be expressed as terms of a screening energy, $U_e$, via:
+
+$$U_e = \frac{e^2}{4\pi\varepsilon_0 \lambda}$$
+
+which has an upper limit in metals of about 300 eV.
+
+While it is common to simplify $V_{\rm screened}$ by performing a taylor expansion of the exponential, this is only justified for high beam energies $E \gg U_e$ where the classical tuning points for tunelling satisfy $r \ll \lambda$. For very low energies, the full exponential must be used.
+
+To incorporate these screening ideas in a way that reduces to the Kolos molecular potential for small screening energies, we can simply take an exponentially screened form of our molecular potential:
+
+$$
+\begin{align}
+V_{\rm screened} &= V_{\rm mol} e^{-\frac{r}{\lambda}} \\
+ &= \frac{2}{r}(1 - b_1r - b_2r^2) e^{-\alpha r^s}e^{-\frac{r}{\lambda}}
+\end{align}
+$$
+
+
+```python
+def V_screened_mol(r_fm, Ue):
+    if Ue == 0:
+        return V_mol(r_fm)
+    else:
+        Ue_J = Ue * eV_to_J
+        screeninglength_m = (e**2 / (4 * np.pi * eps0)) / Ue_J
+        screeninglength_fm = screeninglength_m * 1e15 # in fm
+    
+    return V_mol(r_fm)*np.exp(-r_fm / screeninglength_fm)
+```
+
+We can see in the figure below, that effect of the increasing screening is to transition from a well defined $D_2$ molecular potential to a screened Coulomb potential. It should be noted this model is more of a mathematical convenience than a physical model because of the aforementioned lack of consensus in screening models.
+
+```python
+# Range for r in pm for plotting and fm for the potential functions
+pm = np.linspace(5, 200, 500)
+fm = pm*1000
+# Plot
+plt.figure()
+for Ue in [0, 10, 50, 100, 200, 300]:
+    plt.plot(pm, V_screened_mol(fm,Ue)*1e6, label=f"${Ue}$")
+
+plt.xlabel(r"$r$ (pm)")
+plt.ylabel(r"$V_{screened}$ (eV)")
+plt.legend(title=r"$U_e$")
+plt.ylim(top=25, bottom=-10)
+# plt.savefig("screened-mol-potential-D2.png", dpi=600)
+plt.show()
+```
+
+We now once again repeat the Gamow factor calculation:
+
+$$G = \int_{r_1}^{r_2} \sqrt{\frac{2\mu}{\hbar^2}\left[V_{\rm eff}(r) - E\right]} \, dr$$
+
+but now using $V_{\rm screened}$ instead of $V_{\rm mol}$ for the calculation of $V_{\rm eff}$.
+
+We'll keep $r_2 = 74 \, \rm pm$ fixed, but keep in mind that, because the potential gets increasingly flattened as we increase $U_e$, the deuteron separation effectively moves inwards.
+
+Let's also again consider the $^5S$ state for this demonstration.
+
+We're going to normalise the results so that $U_e = 0$ correspond to the Koonin and Nauenberg rate. This is an attempt to combine the best of both worlds by benefiting from the accuracy of Koonin's solution for the unscreened fusion rate and also benefiting from our simple way of including screening.
+
+
+```python
+Ues = np.linspace(0, 200, 100)
+gamow_many_Ue = []
+
+for Ue in Ues:
+    V_eff = V_nuc(r_fm, state_5S["V0"], state_5S["r_S"], state_5S["a_S"]) + V_cent(r_fm, state_5S["L"]) + V_screened_mol(r_fm, Ue)
+    G = calculate_G(r_fm, V_eff, 74000)
+    exp2G = np.exp(-2*G)
+    Gamma = state_5S["$v_{nuc}/v_{mol}$"] * exp2G * state_5S["gamma"]
+    gamow_many_Ue.append({
+        "$U_e$": Ue,
+        "$G$": G,
+        "$e^{-2G}$": exp2G,
+        "$\Gamma$": Gamma
+    })
+
+# Convert the list of dictionaries to a DataFrame
+gamow_many_Ue = pd.DataFrame(gamow_many_Ue)
+
+# Display the first few rows of the DataFrame
+gamow_many_Ue.head()
+```
+
+Now, normalising to the Koonin value
+
+```python
+Koonin_norm = 3e-64/gamow_many_Ue[gamow_many_Ue["$U_e$"]==0]["$\Gamma$"].values[0]
+gamow_many_Ue["$\Gamma$ (normalised)"] = gamow_many_Ue["$\Gamma$"]*Koonin_norm
+```
+
+```python
+plt.plot(gamow_many_Ue["$U_e$"], gamow_many_Ue["$\Gamma$ (normalised)"])
+
+# Closest values to 150
+target_values = [150]
+closest_points = gamow_many_Ue.iloc[[abs(gamow_many_Ue["$U_e$"] - target).idxmin() for target in target_values]]
+
+# Adding vertical and horizontal lines for the closest points
+for _, row in closest_points.iterrows():
+    U_value = row["$U_e$"]
+    gamma_value = row["$\Gamma$ (normalised)"]
+    # Vertical line from bottom to the curve
+    plt.plot([U_value, U_value], [1e-170, gamma_value], color='gray', linestyle='--')
+    # Horizontal line from the vertical line to the y-axis
+    plt.plot([0, U_value], [gamma_value, gamma_value], color='gray', linestyle='--')
+
+plt.yscale('log')  # Set the y-axis to logarithmic scale
+plt.yticks([1e-20, 1e-30, 1e-40, 1e-50, 1e-60, 1e-70, 1e-80])
+
+plt.xticks([0, 25, 50, 75, 100, 125, 150])
+
+plt.xlabel('Screening energy (eV)')
+plt.ylabel('Fusion rate (s$^{-\mathregular{1}}$)')
+
+plt.xlim([0, 160])
+plt.ylim(ymin=1e-70)
+
+plt.tight_layout()
+# plt.savefig("fusion-rate-screening.png", dpi=600)
+plt.show()
+
+# # COMMENTED OUT CODE CAN BE USED TO REPRODUCE THE FORMAT OF PLOTS FROM https://doi.org/10.1088/1367-2630/ad091c
+# fig, ax = plt.subplots(figsize=(8, 6))
+# plt.yticks([1e-20, 1e-30, 1e-40, 1e-50, 1e-60, 1e-70, 1e-80], [f"{tick:.0E}" for tick in y_ticks])
+# plt.xlabel('Screening energy (eV)', fontsize=25, fontname='Arial')
+# plt.ylabel('Fusion rate (s$^{-\mathregular{1}}$)', fontsize=25, fontname='Arial')
+# plt.xticks(fontsize=25, fontname='Arial')
+# plt.yticks(fontsize=25, fontname='Arial')
+# ax = plt.gca()
+# ax.spines['top'].set_visible(False)
+# ax.spines['right'].set_visible(False)
+```
+
+For a metal like palladium, $U_e \approx 150 \, \rm eV$. This suggests that fusion rates for deuterium inside Palladium could be about 30 orders of magnitude larger than for $D_2$ in a gas.
+
+```python
+
 ```
