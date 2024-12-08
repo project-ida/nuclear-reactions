@@ -18,7 +18,7 @@ jupyter:
 
 # Fusion rates 01
 
-In this notebook, we'll calculate nuclear fusion rates for using the [Gamow model](https://web.archive.org/web/20200504014928/http://web.ihep.su/dbserv/compas/src/gamow28/eng.pdf). We'll first focus our attention the spontaneous fusion of two deuterons in a $\rm D_2$ molecule and then explore what fusion rates we might expect when $\rm D_2$ is absorbed into metals like palladium.
+In this notebook, we'll calculate nuclear fusion rates using the [Gamow model](https://web.archive.org/web/20200504014928/http://web.ihep.su/dbserv/compas/src/gamow28/eng.pdf). We'll first focus our attention the spontaneous fusion of two deuterons in a $\rm D_2$ molecule and then explore what fusion rates we might expect when $\rm D_2$ is absorbed into metals like palladium.
 
 ```python
 import numpy as np
@@ -55,7 +55,7 @@ Fusion can be described as a two step process:
 1. A quantum tunneling event through a potential barrier, with the barrier defined by the interatomic potential between two nuclei.
 2. A relaxation or decay of the highly clustered nuclei into some ground state or decay products (with the concomitant release of energy)
 
-Step 1 is concerned with solving the Schrödinger equation to calculate the probability, $P$, that the the nuclei have passed the Coulomb barrier and are within each other's nuclear volume. Step 2 is concerned with nuclear physics and proceeds at a rate $\gamma$ that's determined from experiment and is typically extremely fast (~$10^{20} s^{-1}$).
+Step 1 is concerned with solving the Schrödinger equation to calculate the probability, $P$, that the the nuclei have passed the Coulomb barrier and are within each other's nuclear volume. Step 2 is concerned with nuclear physics and proceeds at a rate $\gamma$ that's typically extremely fast (~$10^{20} s^{-1}$).
 
 The fusion rate per pair of nuclei can then be simply written as:
 
@@ -103,42 +103,15 @@ This results in a fusion rate of:
 
 $$\Gamma = \frac{v_{nuc}}{v_{mol}}e^{-2G} \gamma$$
 
-where one can interpret $\frac{v_{nuc}}{v_{mol}}e^{-2G}$ as the probability for the particles to have traversed the Coulomb barrier. One might have arrived at this probability from an intuitive consideration of a particle trapped in a box of volume $v_{mol}$ moving around randomly and seeking to land in a target volume $v_{mol}$ only to be hindered by a factor $e^{-2G}$.
+where one can interpret $\frac{v_{nuc}}{v_{mol}}e^{-2G}$ as the probability for the particles to have traversed the Coulomb barrier. One might also have arrived at this probability from an intuitive consideration of a particle trapped in a box of volume $v_{mol}$ moving around randomly and seeking to land in a target volume $v_{mol}$ but hindered by a factor $e^{-2G}$.
 
 Now we've got an expression for the fusion rate, we just have to calculate all the relevant pieces. Let's start with constructing the interatomic potential that's needed for the Gamow factor.
-
-
-Fusion can be described as a two step process:
-1. A quantum tunneling event through a potential barrier, with the barrier defined by the interatomic potential between two nuclei.
-2. A relaxation or decay of the highly clustered nuclei into some ground state or decay products (with the concomitant release of energy)
-
-Step 2 is concerned with nuclear physics and proceeds at a rate $\gamma$ that's determined from experiment and is typically extremely fast (~$10^{20} s^{-1}$).
-
-Step 1 is concerned with solving the [reduced radial Schrödinger equation](https://physics.weber.edu/schroeder/quantum/RadialEquation.pdf) for $u(r)$ that describes the distance, $r$, between the two nuclei:
-
-$$-\frac{\hbar^2}{2\mu} \frac{d^2 u(r)}{dr^2} +  V_{\rm eff}(r) u(r) = E u(r)$$
-
-with $$V_{\rm eff}(r) = V(r) + \frac{L(L+1)\hbar^2}{2\mu r^2}$$
-
-where $\mu$ is the reduced mass of the nuclei, $V(r)$ is the interatomic potential and $\frac{L(L+1)\hbar^2}{2\mu r^2}$ is the centripetal potential associated with the orbital angular momentum, $L$, of the nuclei with respect to one another. 
-
-Note that the total wavefunction $\psi(r, \theta, \phi) = R(r) Y_l^m(\theta, \phi)$ and the "reduced radial wavefunction" is $u(r) = rR(r)$.
-
-A tunneling probability $P$ can then be calculated based on integrating $|\psi|^2$ over the nuclear scale region (typically a few fm from the origin). This results in: 
-
-$$P = \frac{\int_{nuc} |R|^2 r^2dr}{\int_{mol} |R|^2 r^2dr}$$
-
-The fusion rate can then be simply written as 
-
-$$\Gamma = P\gamma$$
-
-
 
 
 ## Potentials
 
 <!-- #region -->
-The effective potential includes the interatomic potential and the centripetal potential:
+In the calculation of the Gamow factor, the interatomic potential needs to be augmented with the centripetal potential to create an effective potential:
 
 $$V_{\rm eff}(r) = V(r) + \frac{L(L+1)\hbar^2}{2\mu r^2}$$
 
@@ -218,7 +191,7 @@ with $r$ in units of the Bohr radius ($a_0$), $V_{mol}$ is in Rydbergs and with
 - $b_2 = -0.2369829512108492$
 - $s = 1.0659864120418940$
 
-We'll make a function that aligns with the nuclear potential in the sense that it takes $r$ in fm and returned potential in MeV.
+We'll make a function that aligns with the nuclear potential in the sense that it takes $r$ in fm and returns the potential in MeV.
 
 ```python
 alpha = 0.6255121237003474
@@ -311,7 +284,7 @@ This effect of the electrons is often called "electron screening" in the sense t
 
 ### Centripetal potential
 
-The centripetal potential is a pseudo-potential that results from casting the Schrödinger equation into a spherical coordinate system. Its repulsive nature prevents systems of attracting bodies that orbit around each other from collapsing in on themselves. It's given by:
+The centripetal potential is a pseudo-potential that results from casting the fusion problem in a spherical coordinate system. Its repulsive nature prevents systems of attracting bodies that orbit around each other from collapsing in on themselves. It's given by:
 
 $$V_{\rm cent} = \frac{L(L+1)\hbar^2}{2\mu r^2}$$
 
@@ -460,7 +433,7 @@ def calculate_G(r, V, r_start):
     return G
 ```
 
-Now, we're ready to calculate the Gamow factor for the different $\rm D_2$ states. We just have to choose a starting separation for the deuterons. We'll start with the equilibrium separation in gas, i.e. 74pm.
+Now, we're ready to calculate the Gamow factor for the different $\rm D_2$ states. We just have to choose a starting separation for the deuterons. We'll start with the equilibrium separation in gas, i.e. 74 pm.
 
 ```python
 r_start = 74000
@@ -612,7 +585,7 @@ for i, gamma in enumerate([7.3e20, 7.3e20, 2.3e20, 1.2e20]):
 gamow_74
 ```
 
-## Calculating the fusion rates for 74pm separation
+## Calculating the fusion rates for 74 pm separation
 
 
 Now we have everything we need to calculate the fusion rates via
@@ -638,7 +611,7 @@ In $\rm D_2$ gas, the deuteron separation is about 74 pm. When deuterium interac
 
 In general, it's not possible to vary just the deuteron separation because one must also self-consistently solve for the electron screening effects that permits the desired deuteron separation.
 
-As a first approximation, we can calculate the fusion rate using the bare Coulomb potential instead of the molecular one and then normalise it to the Koonin and Nauenberg rate at 74 pm. That will give us an order of magnitude sense for how we might expect the fusion rate to change as the deuteron separation changes. This involves repeating what we did above but for different values of $r_2$ in the Gamow factor calculation:
+As a first approximation, we can calculate the fusion rate using the bare Coulomb potential instead of the molecular one and then normalise it to the Koonin and Nauenberg rate at 74 pm. That will give us an order of magnitude sense for how we might expect the fusion rate to change as the deuteron separation changes when we don't account for screening. This involves repeating what we did above but for different values of $r_2$ in the Gamow factor calculation:
 
 $$G = \int_{r_1}^{r_2} \sqrt{\frac{2\mu}{\hbar^2}\left[V_{\rm eff}(r) - E\right]} \, dr$$
 
@@ -726,7 +699,9 @@ plt.show()
 # ax.spines['right'].set_visible(False)
 ```
 
-From the above plot, we can see that the fusion rate for deuterium in palladium O-sites (at 250 pm) is about 82 orders of magnitude smaller than for $\rm D_2$ in a gas.
+From the above plot, we can see that, in the absence of electron screening, the fusion rate for deuterium in palladium O-sites (at 250 pm) would be about 82 orders of magnitude smaller than for $\rm D_2$ in a gas.
+
+Let's now see how much of an effect electron screening can have.
 
 
 ## Screened fusion rates
@@ -801,7 +776,7 @@ We'll keep $r_2 = 74 \, \rm pm$ fixed, but keep in mind that, because the potent
 
 Let's also again consider the $^5S$ state for this demonstration.
 
-We're going to normalise the results so that $U_e = 0$ correspond to the Koonin and Nauenberg rate. This is an attempt to combine the best of both worlds by benefiting from the accuracy of Koonin's solution for the unscreened fusion rate and also benefiting from our simple way of including screening.
+We're going to normalise the results so that $U_e = 0$ corresponds to the Koonin and Nauenberg rate. This is an attempt to combine the best of both worlds by benefiting from the accuracy of Koonin's solution for the unscreened fusion rate and also benefiting from our simple way of including screening.
 
 
 ```python
@@ -883,7 +858,3 @@ For a metal like palladium, $U_e \approx 150 \, \rm eV$. This suggests that fusi
 ## Next up
 
 In the next fusion rates notebook, we'll calculate fusion rates more accurately by solving the Schrödinger equation.
-
-```python
-
-```
