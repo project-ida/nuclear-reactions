@@ -93,7 +93,7 @@ $$\Gamma = n\sigma v$$
 
 
 Although there are no collisions in the spontaneous fusion of a $\rm D_2$ molecule, we can adapt the fusion rate expression from above through a helpful interpretation of $n\sigma v$:
-- Without the Gamow factor, $\sigma v$ represents the nuclear volume that's swept out by a colliding nuclei per unit time and is available for reacting.
+- Without the Gamow factor, $\sigma v$ represents the reactable nuclear volume that's swept out by a colliding nuclei per unit time.
 - $n \sigma v$ then counts how many nuclei are in this "reacting volume" to give us number of reactions per second.
 - The Gamow factor effectively reduces the density of particles in the reacting volume due to the repulsion between the nuclei.
 
