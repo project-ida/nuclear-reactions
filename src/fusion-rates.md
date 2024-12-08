@@ -13,12 +13,12 @@ jupyter:
     name: python3
 ---
 
-<a href="https://colab.research.google.com/github/project-ida/nuclear-reactions/blob/20241119-gamow/fusion-rates.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="https://nbviewer.jupyter.org/github/project-ida/nuclear-reactions/blob/20241119-gamow/fusion-rates.ipynb" target="_parent"><img src="https://nbviewer.jupyter.org/static/img/nav_logo.svg" alt="Open In nbviewer" width="100"/></a>
+<a href="https://colab.research.google.com/github/project-ida/nuclear-reactions/blob/master/fusion-rates.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="https://nbviewer.jupyter.org/github/project-ida/nuclear-reactions/blob/master/fusion-rates.ipynb" target="_parent"><img src="https://nbviewer.jupyter.org/static/img/nav_logo.svg" alt="Open In nbviewer" width="100"/></a>
 
 
 # Fusion rates
 
-In this notebook, we'll calculate nuclear fusion rates for using the [Gamow model](https://web.archive.org/web/20200504014928/http://web.ihep.su/dbserv/compas/src/gamow28/eng.pdf). We'll focus our attention the spontaneous fusion of two deuterons in a $\rm D_2$ molecule.
+In this notebook, we'll calculate nuclear fusion rates for using the [Gamow model](https://web.archive.org/web/20200504014928/http://web.ihep.su/dbserv/compas/src/gamow28/eng.pdf). We'll first focus our attention the spontaneous fusion of two deuterons in a $\rm D_2$ molecule and then explore what fusion rates we might expect when $\rm D_2$ is absorbed into metals like palladium.
 
 ```python
 import numpy as np
@@ -55,6 +55,63 @@ Fusion can be described as a two step process:
 1. A quantum tunneling event through a potential barrier, with the barrier defined by the interatomic potential between two nuclei.
 2. A relaxation or decay of the highly clustered nuclei into some ground state or decay products (with the concomitant release of energy)
 
+Step 1 is concerned with solving the Schrödinger equation to calculate the probability, $P$, that the the nuclei have passed the Coulomb barrier and are within each other's nuclear volume. Step 2 is concerned with nuclear physics and proceeds at a rate $\gamma$ that's determined from experiment and is typically extremely fast (~$10^{20} s^{-1}$).
+
+The fusion rate per pair of nuclei can then be simply written as:
+
+$$\Gamma = P\gamma$$
+
+This two step approach is the most accurate way to calculate the fusion rate and we will explore it in the next notebook. In this notebook, we'd like to work with a simpler description. For this we're going to adapt the approximation of fusion as a collision process to the spontaneous fusion of $\rm D_2$ in a molecule.
+
+
+### Fusion as a collision
+
+In the collision picture, the fusion event occurs instantaneously when two nuclei collide with enough energy, $E$, to be within each others nuclear cross section which is given by:
+
+$$\sigma = \frac{S(E)}{E}e^{-2G(E)}$$
+
+$S(E)$ is the astrophysical S-factor which incorporates the nuclear physics.
+
+$1/E$ takes into account the effective nuclear area as given by the square of the de Broglie wavelength $\lambda_D$:
+
+$$\lambda_D = \frac{h}{p} \sim \frac{1}{\sqrt{E}}$$
+
+$e^{-2G(E)}$ represents the difficulty in tunneling through the Coulomb barrier where $G$ is known as the Gamow factor:
+
+$$G = \int_{r_1}^{r_2} \sqrt{\frac{2\mu}{\hbar^2}\left[V_{\rm}(r) - E\right]} \, dr$$
+
+where $V$ is the interatomic potential and $r_1$ and $r_2$ are the classical turning points for the potential barrier. The presence of the Gamow factor effectively shrinks the nuclear area making it harder for fusion to happen and lower energies.
+
+The fusion rate for the case of a single nuclei colliding at speed $v$ into a target with density $n$ is the particle flux multiplied by the cross section:
+
+$$\Gamma = n\sigma v$$
+
+
+### Spontaneous fusion of $\rm D_2$
+
+
+Although there are no collisions in the spontaneous fusion of a $\rm D_2$ molecule, we can adapt the fusion rate expression from above through a helpful interpretation of $n\sigma v$:
+- $\sigma v$ represents a shrunken (by the Coulomb barrier) nuclear volume that's swept out by a colliding nuclei per unit time.
+- $n \sigma v$ then counts how many nuclei are in this "reacting volume" to give us number of reactions per second.
+
+For the $D_2$ molecule:
+- The reacting volume is just the volume of the nucleus $v_{nuc}$ and we can shrink it using the same Gamow factor
+- The rate at which particles in this volume react is given by $\gamma$
+- The density of nuclei is calculated by the inverse the volume occupied by a single molecule $v_{mol}$.
+
+This results in a fusion rate of:
+
+$$\Gamma = \frac{v_{nuc}}{v_{mol}}e^{-2G} \gamma$$
+
+where one can interpret $\frac{v_{nuc}}{v_{mol}}e^{-2G}$ as the probability for the particles to have traversed the Coulomb barrier. One might have arrived at this probability from an intuitive consideration of a particle trapped in a box of volume $v_{mol}$ moving around randomly and seeking to land in a target volume $v_{mol}$ only to be hindered by a factor $e^{-2G}$.
+
+Now we've got an expression for the fusion rate, we just have to calculate all the relevant pieces. Let's start with constructing the interatomic potential that's needed for the Gamow factor.
+
+
+Fusion can be described as a two step process:
+1. A quantum tunneling event through a potential barrier, with the barrier defined by the interatomic potential between two nuclei.
+2. A relaxation or decay of the highly clustered nuclei into some ground state or decay products (with the concomitant release of energy)
+
 Step 2 is concerned with nuclear physics and proceeds at a rate $\gamma$ that's determined from experiment and is typically extremely fast (~$10^{20} s^{-1}$).
 
 Step 1 is concerned with solving the [reduced radial Schrödinger equation](https://physics.weber.edu/schroeder/quantum/RadialEquation.pdf) for $u(r)$ that describes the distance, $r$, between the two nuclei:
@@ -76,26 +133,6 @@ The fusion rate can then be simply written as
 $$\Gamma = P\gamma$$
 
 
-
-
-## The Gamow model
-
-
-Instead of solving the Schrödinger exactly, we can can apply the [WKB approximation](https://en.wikipedia.org/wiki/Quantum_tunnelling#WKB_approximation) to obtain a simpler approximate solution. This was the approach taken by [Gamow](https://web.archive.org/web/20200504014928/http://web.ihep.su/dbserv/compas/src/gamow28/eng.pdf) in 1928 who found an analytical expression relating the the amplitude of the wave functions on either side of a barrier. For our problem, we'd write it as:
-
-$$\frac{|R_{nuc}|}{|R_{mol}|} =e^{-G} $$
-
-with the Gamow factor $G$ is given by:
-
-$$G = \int_{r_1}^{r_2} \sqrt{\frac{2\mu}{\hbar^2}\left[V_{\rm eff}(r) - E\right]} \, dr$$
-
-where the integration is inside the classically forbidden region and so $r_1$ and $r_2$ are the classical turning points for the potential barrier.
-
-If we assume a constant radial probability density $R$, then the associated tunneling probability is:
-
-$$P = \frac{v_{nuc}}{v_{mol}}e^{-2 G} $$
-
-where ${v_{nuc} / v_{mol}}$ is the ratio of the nuclear volume to molecular volumes that arrises from the volume integration.
 
 
 ## Potentials
@@ -269,7 +306,7 @@ The lower the Coulomb barrier, the closer the deuterons can get before they need
 This approximately $25 \, \rm eV$ might not seem like a lot, but because of the exponentially sensitive nature of the Gamow factor it has an outsized impact.
 
 
-This effect of the electrons is often called "electron screening" in the sense that the electrons screen the repulsion between the nuclei. The details are complicated and without a first-principles description at low energies. Phenomenological models have been created and we will use one later in the notebook when calculating fusion rates of deuterium in metal lattices.
+This effect of the electrons is often called "electron screening" in the sense that the electrons reduce the repulsion between the nuclei. The details are complicated and without a first-principles description at low energies. Phenomenological models have been created and we will use one later in the notebook when calculating fusion rates of deuterium in metal lattices.
 
 
 ### Centripetal potential
