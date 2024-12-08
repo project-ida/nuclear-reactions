@@ -82,7 +82,7 @@ $e^{-2G(E)}$ represents the difficulty in tunneling through the Coulomb barrier 
 
 $$G = \int_{r_1}^{r_2} \sqrt{\frac{2\mu}{\hbar^2}\left[V_{\rm}(r) - E\right]} \, dr$$
 
-where $V$ is the interatomic potential and $r_1$ and $r_2$ are the classical turning points for the potential barrier. The presence of the Gamow factor effectively shrinks the nuclear area making it harder for fusion to happen and lower energies.
+where $V$ is the interatomic potential and $r_1$ and $r_2$ are the classical turning points for the potential barrier.
 
 The fusion rate for the case of a single nuclei colliding at speed $v$ into a target with density $n$ is the particle flux multiplied by the cross section:
 
@@ -93,13 +93,15 @@ $$\Gamma = n\sigma v$$
 
 
 Although there are no collisions in the spontaneous fusion of a $\rm D_2$ molecule, we can adapt the fusion rate expression from above through a helpful interpretation of $n\sigma v$:
-- $\sigma v$ represents a shrunken (by the Coulomb barrier) nuclear volume that's swept out by a colliding nuclei per unit time.
+- Without the Gamow factor, $\sigma v$ represents the nuclear volume that's swept out by a colliding nuclei per unit time and is available for reacting.
 - $n \sigma v$ then counts how many nuclei are in this "reacting volume" to give us number of reactions per second.
+- The Gamow factor effectively reduces the density of particles in the reacting volume due to the repulsion between the nuclei.
 
 For the $D_2$ molecule:
-- The reacting volume is just the volume of the nucleus $v_{nuc}$ and we can shrink it using the same Gamow factor
+- The reacting volume is just the volume of the nucleus $v_{nuc}$
 - The rate at which particles in this volume react is given by $\gamma$
-- The density of nuclei is calculated by the inverse the volume occupied by a single molecule $v_{mol}$.
+- The density of nuclei is calculated by the inverse the volume occupied by a single molecule $1/v_{mol}$.
+- The effective density of nuclei in the reacting volume is $e^{-2G}/v_{mol}$ due to the repulsion of the nuclei.
 
 This results in a fusion rate of:
 
