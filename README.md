@@ -5,3 +5,4 @@ This repo is dedicated to exploring nuclear reactions. The notebooks contained i
 ## Tutorials
 
 - [Energetics of nuclear reactions](nuclear-energetics.ipynb)
+- [Fusion rates 01](fusion-rates-gamow.ipynb)
