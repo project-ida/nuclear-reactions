@@ -731,12 +731,9 @@ While it is common to simplify $V_{\rm screened}$ by performing a taylor expansi
 
 To incorporate these screening ideas in a way that reduces to the Kolos molecular potential for small screening energies, we can simply take an exponentially screened form of our molecular potential:
 
-$$
-\begin{align}
-V_{\rm screened} &= V_{\rm mol} e^{-\frac{r}{\lambda}} \\
- &= \frac{2}{r}(1 - b_1r - b_2r^2) e^{-\alpha r^s}e^{-\frac{r}{\lambda}}
-\end{align}
-$$
+$$V_{\rm screened} = V_{\rm mol} e^{-\frac{r}{\lambda}} $$
+ 
+$$V_{\rm screened}= \frac{2}{r}(1 - b_1r - b_2r^2) e^{-\alpha r^s}e^{-\frac{r}{\lambda}}$$
 
 
 ```python
