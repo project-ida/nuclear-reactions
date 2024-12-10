@@ -55,7 +55,7 @@ muDD = ((deuteron_mass*deuteron_mass) / (deuteron_mass+deuteron_mass)) # reduced
 
 Fusion can be described as a two step process:
 1. A quantum tunneling event through a potential barrier, with the barrier defined by the interatomic potential between two nuclei.
-2. A relaxation or decay of the highly clustered nuclei into some ground state or decay products (with the concomitant release of energy)
+2. A relaxation or decay of the highly excited nuclei into some ground state or decay products (with the concomitant release of energy)
 
 Step 1 is concerned with solving the Schrödinger equation to calculate the probability, $P$, that the the nuclei have passed the Coulomb barrier and are within each other's nuclear volume. Step 2 is concerned with nuclear physics and proceeds at a rate $\gamma$ that's typically extremely fast (~$10^{20} s^{-1}$).
 
@@ -63,7 +63,7 @@ The fusion rate per pair of nuclei can then be simply written as:
 
 $$\Gamma = P\gamma$$
 
-This two step approach is the most accurate way to calculate the fusion rate and we will explore it in the next notebook. In this notebook, we'd like to work with a simpler description. For this we're going to adapt the approximation of fusion as a collision process to the spontaneous fusion of $\rm D_2$ in a molecule.
+This two step approach is the most accurate way to calculate the fusion rate and we will explore it in the next notebook. In this notebook, we'd like to work with a simpler description, which is however commonly used. We're going to adapt the approximation of fusion as a collision process to the spontaneous fusion of $\rm D_2$ in a molecule.
 
 
 ### Fusion as a collision
@@ -72,7 +72,7 @@ In the collision picture, the fusion event occurs instantaneously when two nucle
 
 $$\sigma = \frac{S(E)}{E}e^{-2G(E)}$$
 
-$S(E)$ is the astrophysical S-factor which incorporates the nuclear physics.
+$S(E)$ is the astrophysical S-factor which incorporates the nuclear physics part of the reaction.
 
 $1/E$ takes into account the effective nuclear area as given by the square of the de Broglie wavelength $\lambda_D$:
 
@@ -82,9 +82,9 @@ $e^{-2G(E)}$ represents the difficulty in tunneling through the Coulomb barrier 
 
 $$G = \int_{r_1}^{r_2} \sqrt{\frac{2\mu}{\hbar^2}\left[V_{\rm}(r) - E\right]} \, dr$$
 
-where $V$ is the interatomic potential and $r_1$ and $r_2$ are the classical turning points for the potential barrier.
+Here $V$ is the interatomic potential and $r_1$ and $r_2$ are the classical turning points for the potential barrier.
 
-The fusion rate for the case of a single nuclei colliding at speed $v$ into a target with density $n$ is the particle flux multiplied by the cross section:
+The fusion rate for the case of a single nucleus colliding at speed $v$ into a target with density $n$ is the particle flux multiplied by the cross section:
 
 $$\Gamma = n\sigma v$$
 
@@ -93,7 +93,7 @@ $$\Gamma = n\sigma v$$
 
 
 Although there are no collisions in the spontaneous fusion of a $\rm D_2$ molecule, we can adapt the fusion rate expression from above through a helpful interpretation of $n\sigma v$:
-- Without the Gamow factor, $\sigma v$ represents the reactable nuclear volume that's swept out by a colliding nuclei per unit time.
+- Without the Gamow factor, $\sigma v$ represents the reactable nuclear volume that's swept out by a colliding nucleus per unit time.
 - $n \sigma v$ then counts how many nuclei are in this "reacting volume" to give us number of reactions per second.
 - The Gamow factor effectively reduces the density of particles in the reacting volume due to the repulsion between the nuclei.
 
@@ -120,7 +120,7 @@ In the calculation of the Gamow factor, the interatomic potential needs to be au
 $$V_{\rm eff}(r) = V(r) + \frac{L(L+1)\hbar^2}{2\mu r^2}$$
 
 
-For a $\rm D_2$ molecule, the interatomic potential $V(r)$ consists of 2 parts - the nuclear and molecular potentials:
+For a $\rm D_2$ molecule, the interatomic potential $V(r)$ consists of two parts - the nuclear and molecular potentials:
 
 $$V(r) = V_{\rm nuc}^{S,L}(r) + V_{\rm mol}(r)$$
 
@@ -160,7 +160,7 @@ states = [
 ]
 ```
 
-We can then see that the attractive nuclear potentials become negligible within about 10 fm.
+We can then see that the attractive nuclear potentials become negligible beyond about 10 fm.
 
 ```python
 # Generate r values (distance in fm)
@@ -185,7 +185,7 @@ plt.show()
 
 A $\rm D_2$ molecule exists because of a balance between the electrostatic repulsion between the nuclei and an attraction  between nuclei and the electron cloud. This balance results in a 74 pm equilibrium distance between the deuterons in a gas.
 
-There are several options for representing the molecular potential. For example, the [Morse Potential](https://en.wikipedia.org/wiki/Morse_potential) is popular. For a more accurate potential, however, we will draw upon the work of [Kolos 1986](http://dx.doi.org/10.1063/1.1669836). We parameterised the numerical Kolos potential as:
+There are several options for representing the molecular potential. For example, the [Morse Potential](https://en.wikipedia.org/wiki/Morse_potential) is popular. For a more accurate potential, however, we will draw upon the work of [Kolos & Wolniewicz 1986](http://dx.doi.org/10.1063/1.1669836). We parameterised the numerical Kolos potential as:
 
 $$V_{mol}(r) = \frac{2}{r}(1 - b_1r - b_2r^2) e^{-\alpha r^s}$$
 
@@ -222,6 +222,7 @@ plt.figure()
 plt.plot(r_pm, V_mol_values*1e6, label=r"$V_{mol}(r)$")
 plt.xlabel(r"$r$ (pm)")
 plt.ylabel(r"$V_{mol}$ (eV)")
+plt.axvline(x=74, color="grey", linestyle='--', linewidth=1)
 # plt.savefig("mol-potential-D2.png", dpi=600)
 plt.show()
 ```
@@ -272,7 +273,7 @@ plt.legend()
 plt.show()
 ```
 
-Although the effect of the electrons is in general complicated, we can see that overall the electrons act to lower the bare Coulomb potential. If we take 74 pm as a representative separation of the deuterons in the molecule, then we can roughly say that the electrons have lowered the coulomb barrier by an amount:
+Although the effect of the electrons is in general complicated, we can see that overall the electrons act to lower the bare Coulomb potential. If we take 74 pm as a representative separation of the deuterons in the molecule, then we can roughly say that the electrons have lowered the Coulomb barrier by an amount:
 
 ```python
 (V_coulomb(74000) - V_mol(74000))*1e6 # this is in eV
@@ -283,7 +284,7 @@ The lower the Coulomb barrier, the closer the deuterons can get before they need
 This approximately $25 \, \rm eV$ might not seem like a lot, but because of the exponentially sensitive nature of the Gamow factor it has an outsized impact.
 
 
-This effect of the electrons is often called "electron screening" in the sense that the electrons reduce the repulsion between the nuclei. The details are complicated and without a first-principles description at low energies. Phenomenological models have been created and we will use one later in the notebook when calculating fusion rates of deuterium in metal lattices.
+This effect of the electrons is often called "electron screening" in the sense that the electrons reduce the repulsion between the nuclei. The details are complicated and to date a comprehensive first-principles description at low energies does not exist. Phenomenological models have been created and we will use one later in the notebook when calculating fusion rates of deuterium in metal lattices.
 
 
 ### Centripetal potential
@@ -325,7 +326,7 @@ plt.show()
 
 ### Total effective potential
 
-Taken all together, we can see both the coulomb barrier and the presence of the attractive nuclear potential on the other side of the barrier.
+Taken all together, we can see both the Coulomb barrier and the presence of the attractive nuclear potential on the other side of the barrier.
 
 ```python
 fig, ax = plt.subplots()
@@ -511,7 +512,7 @@ gamow_74
 ## Nuclear relaxation/decay for $\rm D_2$ fusion
 
 
-When the deuterons tunnel through the Coulomb barrier, for a very brief moment, they form a highly clustered state that can be recognised as an excited state of $\rm ^4He$ (often denoted $\rm ^4He^*$). There are several excited states and they decay via different "channels". For example:
+When the deuterons tunnel through the Coulomb barrier, for a very brief moment, they form a state that can be recognised as an excited state of $\rm ^4He$ (often denoted $\rm ^4He^*$). There are several excited states and they decay via different "channels". For example:
 - Relaxation into the ground state $\rm ^4He$ with the emission of a gamma ray
 - Decay into a proton and triton
 - Decay into a neutron and $\rm ^3He$
@@ -605,13 +606,13 @@ It's instructive to compare the Gamow based fusion rates to those calculated by 
 
 Their rate was calculated to be $\Gamma = 3 \times 10^{-64} \, \rm s^{-1}$
 
-Although the Gamow rate is 3 orders of magnitude below the more accurate value, the Gamow approach allows us to incorporate screening effects more easily. We'll see this later in the notebook.
+Although the Gamow rate is 3 orders of magnitude below the more accurate value, the Gamow approach allows us to incorporate screening effects more easily, so this approach has its own set of benefits. We'll see this later in the notebook.
 
 
 ## Fusion rates as a function of deuteron separation
 
 
-In $\rm D_2$ gas, the deuteron separation is about 74 pm. When deuterium interacts with metals like palladium, the separation can be very different. For example, deuterons in the "O-sites" of a palladium lattice are separated by 250 pm, whereas the separation in "di-hydrogen" bound to palladium is 85 pm . It's therefore of interest to calculate the fusion rate as a function of deuteron separation.
+In $\rm D_2$ gas, the deuteron separation is about 74 pm. When deuterium interacts with metals like palladium, the separation can be very different. For example, deuterons in the "O-sites" of a palladium lattice are separated by about 250 pm, whereas the H-H separation in "di-hydrogen" bound to palladium is 85 pm . It's therefore of interest to calculate the fusion rate as a function of deuteron separation.
 
 In general, it's not possible to vary just the deuteron separation because one must also self-consistently solve for the electron screening effects that permits the desired deuteron separation.
 
@@ -711,7 +712,7 @@ Let's now see how much of an effect electron screening can have.
 ## Screened fusion rates
 
 
-We know that $\rm D_2$ can get absorbed into metals like Palladium. The abundance of electrons inside a metal invites us to consider more deeply the effect of electron screening on fusion rates. 
+We know that $\rm D_2$ can get absorbed into metals like palladium. The abundance of electrons inside a metal invites us to consider more deeply the effect of electron screening on fusion rates. 
 
 Simplistically, electron screening reduces the positive electrostatic repulsion between nuclei and results in a reduced interatomic distance and hence higher fusion rates. Most theoretical descriptions of screening in metals have been developed to attempt to explain anomalously high fusion rates in low energy beam-target experiments (see e.g. [Huke et.al](http://dx.doi.org/10.1103/PhysRevC.78.015803)). These models have had some success, but there are still discrepancies with experiments and a rigorous theory of the extremely low energy regime has yet to be agreed upon.
 
@@ -727,7 +728,7 @@ $$U_e = \frac{e^2}{4\pi\varepsilon_0 \lambda}$$
 
 which has an upper limit in metals of about 300 eV.
 
-While it is common to simplify $V_{\rm screened}$ by performing a taylor expansion of the exponential, this is only justified for high beam energies $E \gg U_e$ where the classical tuning points for tunelling satisfy $r \ll \lambda$. For very low energies, the full exponential must be used.
+While it is common to simplify $V_{\rm screened}$ by performing a Taylor expansion of the exponential, this is only justified for high beam energies $E \gg U_e$ where the classical tuning points for tunelling satisfy $r \ll \lambda$. For very low energies, the full exponential must be used.
 
 To incorporate these screening ideas in a way that reduces to the Kolos molecular potential for small screening energies, we can simply take an exponentially screened form of our molecular potential:
 
@@ -853,9 +854,9 @@ plt.show()
 # ax.spines['right'].set_visible(False)
 ```
 
-For a metal like palladium, $U_e \approx 150 \, \rm eV$. This suggests that fusion rates for deuterium inside Palladium could be about 30 orders of magnitude larger than for $D_2$ in a gas.
+For a metal like palladium, $U_e$ has been estimated as $U_e \approx 150 \, \rm eV$ ([Huke et al. 2008](https://journals.aps.org/prc/abstract/10.1103/PhysRevC.78.015803) ). This suggests that fusion rates for deuterium inside palladium could be about 30 orders of magnitude larger than for $D_2$ in a gas.  In actuality, screening may be higher, especially when considering special sites in the metal such as defects (see [Kowalska et al. 2023](https://www.mdpi.com/1996-1944/16/18/6255) ).
 
 
 ## Next up
 
-In the next fusion rates notebook, we'll calculate fusion rates more accurately by solving the Schrödinger equation.
+In the next fusion rates notebook, calculate fusion rates using a more accurate method, namely by solving the Schrödinger equation.
