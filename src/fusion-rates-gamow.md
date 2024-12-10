@@ -16,7 +16,7 @@ jupyter:
 <a href="https://colab.research.google.com/github/project-ida/nuclear-reactions/blob/master/fusion-rates-gamow.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="https://nbviewer.jupyter.org/github/project-ida/nuclear-reactions/blob/master/fusion-rates-gamow.ipynb" target="_parent"><img src="https://nbviewer.jupyter.org/static/img/nav_logo.svg" alt="Open In nbviewer" width="100"/></a>
 
 
-# Fusion rates 01
+# Fusion rates (Gamow)
 
 In this notebook, we'll calculate nuclear fusion rates using the [Gamow model](https://web.archive.org/web/20200504014928/http://web.ihep.su/dbserv/compas/src/gamow28/eng.pdf). We'll first focus our attention the spontaneous fusion of two deuterons in a $\rm D_2$ molecule and then explore what fusion rates we might expect when $\rm D_2$ is absorbed into metals like palladium.
 
