@@ -728,7 +728,7 @@ $$U_e = \frac{e^2}{4\pi\varepsilon_0 \lambda}$$
 
 which has an upper limit in metals of about 300 eV.
 
-While it is common to simplify $V_{\rm screened}$ by performing a Taylor expansion of the exponential, this is only justified for high beam energies $E \gg U_e$ where the classical tuning points for tunelling satisfy $r \ll \lambda$. For very low energies, the full exponential must be used.
+While it is common to simplify $V_{\rm screened}$ by performing a Taylor expansion of the exponential, this is only justified for high beam energies $E \gg U_e$ where the classical tuning points for tunneling satisfy $r \ll \lambda$. For very low energies, the full exponential must be used.
 
 To incorporate these screening ideas in a way that reduces to the Kolos molecular potential for small screening energies, we can simply take an exponentially screened form of our molecular potential:
 
