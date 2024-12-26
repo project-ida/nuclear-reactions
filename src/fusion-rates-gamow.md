@@ -127,7 +127,7 @@ $$V(r) = V_{\rm nuc}^{S,L}(r) + V_{\rm mol}(r)$$
 
 <!-- #endregion -->
 
-### Nuclear potential
+### Nuclear potential 
 
 We use the Woods-Saxon nuclear potential (in MeV):
 
