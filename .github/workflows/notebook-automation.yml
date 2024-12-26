@@ -12,7 +12,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ssh-key: ${{ secrets.DEPLOY_KEY }}
+          ssh-key: ${{ secrets.ACTIONS_BOT_KEY }}
 
       - name: Identify Modified and Deleted Notebooks
         id: diff-notebooks
