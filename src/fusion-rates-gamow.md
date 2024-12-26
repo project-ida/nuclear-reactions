@@ -135,7 +135,7 @@ $$V_{\rm nuc}^{S,L}(r) ~=~ {V_0 \over 1 + e^{(r - r_S) / a_S}}$$
 
 
 ```python
-# The nuclear Woods-Saxon nuclear potential
+# The nuclear Woods-Saxon nuclear potential 
 def V_nuc(r, V0, r_S, a_S):
     r_safe = np.minimum(r, 100) # Prevents overflow errors in the exponential when r is in the pm range
     return V0 / (1 + np.exp((r_safe - r_S) / a_S))
